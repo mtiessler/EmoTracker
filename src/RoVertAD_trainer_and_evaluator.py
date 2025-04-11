@@ -14,7 +14,7 @@ import itertools
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 load_dotenv(dotenv_path=Path("..") / ".env")
-FILE_PATH = os.getenv('FILE_PATH', 'vad_lexicon.csv')
+FILE_PATH = os.path.join('..', 'data', 'vad_lexicon.csv')
 TOKENIZER_NAME = os.getenv('TOKENIZER_NAME', 'roberta-base')
 
 
@@ -33,6 +33,20 @@ def log_error(message):
 def load_and_preprocess_data(file_path, tokenizer_name, max_len, batch_size):
     log_info(f"Loading and preprocessing data from {file_path}")
     df = pd.read_csv(file_path)
+
+    # Convert Word column to string and handle NaN values
+    df['Word'] = df['Word'].astype(str)
+
+    # Filtering atypical words
+    for i in df.index:
+        word = df.loc[i, 'Word']
+        try:
+            if ((" " in word) or any(x.isupper() for x in word) or "'" in word or word == 'nan'):
+                df.drop(i, inplace=True)
+        except Exception as e:
+            log_error(f"Error processing word '{word}': {e}")
+            df.drop(i, inplace=True)
+
     tokenizer = RobertaTokenizer.from_pretrained(tokenizer_name)
 
     class VADDataset(Dataset):
@@ -66,12 +80,14 @@ def load_and_preprocess_data(file_path, tokenizer_name, max_len, batch_size):
                 'labels': torch.tensor(label, dtype=torch.float)
             }
 
+    # Using V.Mean.Sum as valence, A.Mean.Sum as arousal, D.Mean.Sum as dominance
+    # You can change this to predict other dimensions as needed
     train_df, temp_df = train_test_split(df, test_size=0.3, random_state=42)
     val_df, test_df = train_test_split(temp_df, test_size=0.5, random_state=42)
 
-    train_dataset = VADDataset(train_df['word'].values, train_df['valence'].values, tokenizer, max_len)
-    val_dataset = VADDataset(val_df['word'].values, val_df['valence'].values, tokenizer, max_len)
-    test_dataset = VADDataset(test_df['word'].values, test_df['valence'].values, tokenizer, max_len)
+    train_dataset = VADDataset(train_df['Word'].values, train_df['V.Mean.Sum'].values, tokenizer, max_len)
+    val_dataset = VADDataset(val_df['Word'].values, val_df['V.Mean.Sum'].values, tokenizer, max_len)
+    test_dataset = VADDataset(test_df['Word'].values, test_df['V.Mean.Sum'].values, tokenizer, max_len)
 
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
@@ -121,7 +137,7 @@ def train_and_validate(model, train_dataloader, val_dataloader, optimizer, sched
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device).unsqueeze(1)
 
-            optimizer.zero_grad()  # Changed from model.zero_grad()
+            optimizer.zero_grad()
             outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
             loss = outputs.loss
             total_loss += loss.item()
