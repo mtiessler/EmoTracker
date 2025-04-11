@@ -81,11 +81,13 @@ def load_and_preprocess_data(file_path, tokenizer_name, max_len, batch_size):
             }
 
     # Using V.Mean.Sum as valence, A.Mean.Sum as arousal, D.Mean.Sum as dominance
-    # You can change this to predict other dimensions as needed
     train_df, temp_df = train_test_split(df, test_size=0.3, random_state=42)
     val_df, test_df = train_test_split(temp_df, test_size=0.5, random_state=42)
 
-    train_dataset = VADDataset(train_df['Word'].values, train_df['V.Mean.Sum'].values, tokenizer, max_len)
+    train_dataset = VADDataset(train_df['Word'].values,
+                               train_df['V.Mean.Sum'].values,
+                               tokenizer,
+                               max_len)
     val_dataset = VADDataset(val_df['Word'].values, val_df['V.Mean.Sum'].values, tokenizer, max_len)
     test_dataset = VADDataset(test_df['Word'].values, test_df['V.Mean.Sum'].values, tokenizer, max_len)
 
@@ -97,7 +99,11 @@ def load_and_preprocess_data(file_path, tokenizer_name, max_len, batch_size):
     return train_dataloader, val_dataloader, test_dataloader
 
 
-def initialize_model_optimizer_scheduler(model_name, num_labels, learning_rate, total_steps, dropout_rate,
+def initialize_model_optimizer_scheduler(model_name,
+                                         num_labels,
+                                         learning_rate,
+                                         total_steps,
+                                         dropout_rate,
                                          warmup_steps):
     log_info("Initializing model, optimizer, and scheduler.")
     model = RobertaForSequenceClassification.from_pretrained(
@@ -120,7 +126,13 @@ def initialize_model_optimizer_scheduler(model_name, num_labels, learning_rate, 
     return model, optimizer, scheduler, device
 
 
-def train_and_validate(model, train_dataloader, val_dataloader, optimizer, scheduler, device, epochs):
+def train_and_validate(model,
+                       train_dataloader,
+                       val_dataloader,
+                       optimizer,
+                       scheduler,
+                       device,
+                       epochs):
     log_info("Starting training and validation.")
     train_losses = []
     val_losses = []
@@ -196,7 +208,12 @@ def hyperparam_exploration():
             max_lens, batch_sizes, epochs_list, learning_rates, dropout_rates, warmup_steps_list
     ):
         log_info(
-            f"Trying: MAX_LEN={max_len}, BATCH_SIZE={batch_size}, EPOCHS={epochs}, LEARNING_RATE={learning_rate}, DROPOUT_RATE={dropout_rate}, WARMUP_STEPS={warmup_steps}")
+            f"Trying: MAX_LEN={max_len}, "
+            f"BATCH_SIZE={batch_size}, "
+            f"EPOCHS={epochs}, "
+            f"LEARNING_RATE={learning_rate}, "
+            f"DROPOUT_RATE={dropout_rate}, "
+            f"WARMUP_STEPS={warmup_steps}")
         try:
             train_dataloader, val_dataloader, _ = load_and_preprocess_data(FILE_PATH, TOKENIZER_NAME, max_len,
                                                                            batch_size)
