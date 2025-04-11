@@ -15,18 +15,22 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 load_dotenv(dotenv_path=Path("..") / ".env")
 FILE_PATH = os.getenv('FILE_PATH', 'vad_lexicon.csv')
-TOKENIZER_NAME = os.getenv('roberta-base')
+TOKENIZER_NAME = os.getenv('TOKENIZER_NAME', 'roberta-base')
+
 
 def log_info(message):
     logging.info(message)
 
+
 def log_warning(message):
     logging.warning(message)
+
 
 def log_error(message):
     logging.error(message)
 
-def load_and_preprocess_data(file_path, tokenizer_name, max_len):
+
+def load_and_preprocess_data(file_path, tokenizer_name, max_len, batch_size):
     log_info(f"Loading and preprocessing data from {file_path}")
     df = pd.read_csv(file_path)
     tokenizer = RobertaTokenizer.from_pretrained(tokenizer_name)
@@ -69,24 +73,36 @@ def load_and_preprocess_data(file_path, tokenizer_name, max_len):
     val_dataset = VADDataset(val_df['word'].values, val_df['valence'].values, tokenizer, max_len)
     test_dataset = VADDataset(test_df['word'].values, test_df['valence'].values, tokenizer, max_len)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
-    test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+    test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
     log_info("Data loaded and preprocessed.")
     return train_dataloader, val_dataloader, test_dataloader
 
-def initialize_model_optimizer_scheduler(model_name, num_labels, learning_rate, total_steps, dropout_rate, warmup_steps):
+
+def initialize_model_optimizer_scheduler(model_name, num_labels, learning_rate, total_steps, dropout_rate,
+                                         warmup_steps):
     log_info("Initializing model, optimizer, and scheduler.")
-    model = RobertaForSequenceClassification.from_pretrained(model_name, num_labels=num_labels, hidden_dropout_prob=dropout_rate, attention_probs_dropout_prob=dropout_rate)
+    model = RobertaForSequenceClassification.from_pretrained(
+        model_name,
+        num_labels=num_labels,
+        hidden_dropout_prob=dropout_rate,
+        attention_probs_dropout_prob=dropout_rate
+    )
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
     optimizer = AdamW(model.parameters(), lr=learning_rate)
-    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=total_steps)
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer,
+        num_warmup_steps=warmup_steps,
+        num_training_steps=total_steps
+    )
 
     log_info("Model, optimizer, and scheduler initialized.")
     return model, optimizer, scheduler, device
+
 
 def train_and_validate(model, train_dataloader, val_dataloader, optimizer, scheduler, device, epochs):
     log_info("Starting training and validation.")
@@ -105,7 +121,7 @@ def train_and_validate(model, train_dataloader, val_dataloader, optimizer, sched
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device).unsqueeze(1)
 
-            model.zero_grad()
+            optimizer.zero_grad()  # Changed from model.zero_grad()
             outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
             loss = outputs.loss
             total_loss += loss.item()
@@ -143,8 +159,10 @@ def train_and_validate(model, train_dataloader, val_dataloader, optimizer, sched
         r2 = r2_score(actual_labels, predictions)
         r2_scores.append(r2)
         mse_scores.append(mse)
+        log_info(f'Validation MSE: {mse:.4f}, R2: {r2:.4f}')
 
     return train_losses, val_losses, r2_scores, mse_scores
+
 
 def hyperparam_exploration():
     max_lens = [64, 128, 256]
@@ -158,12 +176,25 @@ def hyperparam_exploration():
     best_params = {}
     results = []
 
-    for max_len, batch_size, epochs, learning_rate, dropout_rate, warmup_steps in itertools.product(max_lens, batch_sizes, epochs_list, learning_rates, dropout_rates, warmup_steps_list):
-        log_info(f"Trying: MAX_LEN={max_len}, BATCH_SIZE={batch_size}, EPOCHS={epochs}, LEARNING_RATE={learning_rate}, DROPOUT_RATE={dropout_rate}, WARMUP_STEPS={warmup_steps}")
+    for max_len, batch_size, epochs, learning_rate, dropout_rate, warmup_steps in itertools.product(
+            max_lens, batch_sizes, epochs_list, learning_rates, dropout_rates, warmup_steps_list
+    ):
+        log_info(
+            f"Trying: MAX_LEN={max_len}, BATCH_SIZE={batch_size}, EPOCHS={epochs}, LEARNING_RATE={learning_rate}, DROPOUT_RATE={dropout_rate}, WARMUP_STEPS={warmup_steps}")
         try:
-            train_dataloader, val_dataloader, _ = load_and_preprocess_data(FILE_PATH, TOKENIZER_NAME, max_len)
-            model, optimizer, scheduler, device = initialize_model_optimizer_scheduler(TOKENIZER_NAME, 1, learning_rate, len(train_dataloader) * epochs, dropout_rate, warmup_steps)
-            train_losses, val_losses, r2_scores, mse_scores = train_and_validate(model, train_dataloader, val_dataloader, optimizer, scheduler, device, epochs)
+            train_dataloader, val_dataloader, _ = load_and_preprocess_data(FILE_PATH, TOKENIZER_NAME, max_len,
+                                                                           batch_size)
+            model, optimizer, scheduler, device = initialize_model_optimizer_scheduler(
+                TOKENIZER_NAME,
+                1,
+                learning_rate,
+                len(train_dataloader) * epochs,
+                dropout_rate,
+                warmup_steps
+            )
+            train_losses, val_losses, r2_scores, mse_scores = train_and_validate(
+                model, train_dataloader, val_dataloader, optimizer, scheduler, device, epochs
+            )
             avg_r2 = sum(r2_scores) / len(r2_scores)
             results.append({
                 'MAX_LEN': max_len,
@@ -194,6 +225,7 @@ def hyperparam_exploration():
     log_info(f"Best Parameters: {best_params}")
     return best_params
 
+
 def evaluate_model(model, test_dataloader, device):
     log_info("Evaluating model on test set.")
     model.eval()
@@ -213,20 +245,39 @@ def evaluate_model(model, test_dataloader, device):
     mse = mean_squared_error(actual_labels, predictions)
     r2 = r2_score(actual_labels, predictions)
 
-    log_info(f"Mean Squared Error: {mse:.4f}")
-    log_info(f"R-squared: {r2:.4f}")
+    log_info(f"Test MSE: {mse:.4f}")
+    log_info(f"Test R-squared: {r2:.4f}")
     return mse, r2
+
 
 def plot_losses(train_losses, val_losses, r2_scores, mse_scores):
     log_info("Plotting training and validation losses.")
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
     plt.plot(train_losses, label='Training Loss')
     plt.plot(val_losses, label='Validation Loss')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.title('Training and Validation Loss')
     plt.legend()
-    plt.savefig('train_val_loss.png')
+
+    plt.subplot(1, 3, 2)
+    plt.plot(r2_scores, label='R2 Score', color='green')
+    plt.xlabel('Epochs')
+    plt.ylabel('R2 Score')
+    plt.title('Validation R2 Score')
+    plt.legend()
+
+    plt.subplot(1, 3, 3)
+    plt.plot(mse_scores, label='MSE', color='red')
+    plt.xlabel('Epochs')
+    plt.ylabel('MSE')
+    plt.title('Validation MSE')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig('training_metrics.png')
     plt.show()
 
     results_df = pd.DataFrame({
@@ -238,6 +289,7 @@ def plot_losses(train_losses, val_losses, r2_scores, mse_scores):
     })
     results_df.to_csv('training_results.csv', index=False)
 
+
 def upload_model_to_huggingface(model, repo_name, tokenizer):
     log_info(f"Uploading model and tokenizer to Hugging Face Hub: {repo_name}")
     try:
@@ -247,8 +299,12 @@ def upload_model_to_huggingface(model, repo_name, tokenizer):
     except Exception as e:
         log_error(f"Failed to upload to Hugging Face Hub: {e}")
 
+
 if __name__ == "__main__":
+    # First perform hyperparameter exploration
     best_params = hyperparam_exploration()
+
+    # Use best parameters for final training
     MAX_LEN = best_params['MAX_LEN']
     BATCH_SIZE = best_params['BATCH_SIZE']
     EPOCHS = best_params['EPOCHS']
@@ -256,14 +312,37 @@ if __name__ == "__main__":
     DROPOUT_RATE = best_params['DROPOUT_RATE']
     WARMUP_STEPS = best_params['WARMUP_STEPS']
 
-    train_dataloader, val_dataloader, test_dataloader = load_and_preprocess_data(FILE_PATH, TOKENIZER_NAME, MAX_LEN)
-    model, optimizer, scheduler, device = initialize_model_optimizer_scheduler(TOKENIZER_NAME, 1, LEARNING_RATE, len(train_dataloader) * EPOCHS, DROPOUT_RATE, WARMUP_STEPS)
-    train_losses, val_losses, r2_scores, mse_scores = train_and_validate(model, train_dataloader, val_dataloader, optimizer, scheduler, device, EPOCHS)
+    # Load data with best parameters
+    train_dataloader, val_dataloader, test_dataloader = load_and_preprocess_data(
+        FILE_PATH, TOKENIZER_NAME, MAX_LEN, BATCH_SIZE
+    )
+
+    # Initialize model with best parameters
+    model, optimizer, scheduler, device = initialize_model_optimizer_scheduler(
+        TOKENIZER_NAME,
+        1,
+        LEARNING_RATE,
+        len(train_dataloader) * EPOCHS,
+        DROPOUT_RATE,
+        WARMUP_STEPS
+    )
+
+    # Train and validate
+    train_losses, val_losses, r2_scores, mse_scores = train_and_validate(
+        model, train_dataloader, val_dataloader, optimizer, scheduler, device, EPOCHS
+    )
+
+    # Evaluate on test set
     mse, r2 = evaluate_model(model, test_dataloader, device)
+
+    # Plot results
     plot_losses(train_losses, val_losses, r2_scores, mse_scores)
+
+    # Save model
     torch.save(model.state_dict(), 'finetuned_roberta_valence.pth')
 
-    tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
-    REPO_NAME = os.getenv('mtiessler/RoVertAD')
+    # Upload to Hugging Face Hub if REPO_NAME is set
+    tokenizer = RobertaTokenizer.from_pretrained(TOKENIZER_NAME)
+    REPO_NAME = os.getenv('REPO_NAME')
     if REPO_NAME:
         upload_model_to_huggingface(model, REPO_NAME, tokenizer)
