@@ -1,5 +1,28 @@
 # **RoVERTaD: VAD Inference Over Time with Diachronic Sense Modeling**
 
+
+This project is **still in development**. The following components are functional or under active construction:
+
+- Dataset generation based on Hu et al.’s temporal senses and NRC-VAD is **in progress**
+- RoBERTa training and evaluation pipeline is **in progress**
+- Frontend visualization client is **in progress**
+
+## **Table of Contents**
+
+1. [General Description](#general-description)  
+2. [Detailed Process](#detailed-process)  
+   2.1. [Data Acquisition from Hu et al.](#1-data-acquisition-from-hu-et-al)  
+   2.2. [VAD Analysis for Senses](#2-vad-analysis-for-senses)  
+   2.3. [Resulting Dataset Generation](#3-resulting-dataset-generation)  
+   2.4. [3D Plot Visualization](#4-3d-plot-visualization)  
+   2.5. [RoBERTa Model Training for Temporal VAD Inference](#5-roberta-model-training-for-temporal-vad-inference)  
+3. [Threats to Validity](#threats-to-validity)  
+4. [Project Structure](#project-structure)  
+5. [Installation](#installation)  
+6. [Usage](#usage)  
+
+---
+
 ## **General Description**
 
 This repository contains the code and resources necessary to perform the inference of **Valence**, **Arousal**, and **Dominance** (VAD) values over time using a RoBERTa model trained on a dataset derived from the diachronic sense modeling of Hu et al.
@@ -30,7 +53,7 @@ Finally, this dataset is used to fine-tune a RoBERTa model for temporal VAD infe
   - (**NRC-VAD**)[https://saifmohammad.com/WebPages/nrc-vad.html], updated in 2025, with ~50,000 English words.
   - **EmoBank**, which provides sentence-level VAD annotations—useful for contextual analysis but not directly for sense definitions.
 
-For each sense definition, the keywords are matched against a VAD lexicon. If multiple matches are found, the average VAD values are used to approximate the emotion of that sense.
+For each sense definition, the keywords are matched against a VAD lexicon. If multiple matches are found, the average VAD values are used to approximate the emotion of that sense.  
 In this first iteration we have used **NRC-VAD** lexicon.
 
 ---
@@ -86,4 +109,75 @@ A major limitation of this approach is the lack of a standardized, gold-standard
 As a result, this project makes the **strong assumption** that the emotional quality of a sense (its VAD value) remains constant over time — which is likely not the case. Emotional connotations of words evolve, and this assumption introduces a source of noise into our generated dataset.
 
 To train a temporally accurate RoBERTa model, **expert annotation** of VAD values should be performed for the senses in Hu et al.’s dataset across **20-year intervals** covering 1830–2010. This would establish a reliable ground truth and significantly improve model performance and trustworthiness.
+
+---
+
+## **Project Structure**
+
+```plaintext
+RoVertAD/
+├── data/                              # External data sources
+│   ├── Diachronic_Sense_Modeling/    # Hu et al.'s sense probabilities
+│   │   └── prob_fitting_10.data
+│   └── VAD_Lexicons/
+│       └── NRC-VAD-Lexicon-v2.1/
+│           ├── NRC-VAD-Lexicon-v2.1.txt
+│           └── README.txt
+│
+├── env/                               # Virtual environment (optional)
+│
+├── src/                               # Core source code
+│   ├── model/
+│   │   ├── config.py                  # Config and hyperparameters
+│   │   ├── data_loader.py            # Loads time-VAD dataset
+│   │   ├── model.py                  # RoBERTa model wrapper
+│   │   ├── trainer.py                # Training loop and loss functions
+│   │   ├── utils.py                  # Helper functions
+│   │   └── main.py                   # Entrypoint to training/inference
+│   └── scripts/
+│       └── format_converter.py       # Convert Hu et al.’s format to usable data
+│
+├── visualization_client/             # Frontend visualization (React app)
+│   ├── package.json                  # React dependencies and scripts
+│   └── ...                           # React components and pages
+│
+├── .env
+├── .gitignore
+├── LICENSE
+├── README.md
+└── requirements.txt                  # Python dependencies
+```
+
+---
+
+## **Installation**
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourname/RoVertAD.git
+cd RoVertAD
+```
+
+### 2. Create a virtual environment
+
+```bash
+python -m venv env
+source env/bin/activate  # On Windows: env\Scripts\activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. (Optional) Install frontend dependencies
+
+```bash
+cd visualization_client
+npm install
+```
+
+---
 
