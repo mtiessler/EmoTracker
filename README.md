@@ -27,10 +27,11 @@ Finally, this dataset is used to fine-tune a RoBERTa model for temporal VAD infe
 - A VAD lexicon is used to assign Valence (positivity/negativity), Arousal (calmness/excitement), and Dominance (sense of control) values to the definitions of word senses.
 - Existing VAD lexicons include:
   - **ANEW** and its extension by Warriner et al. (2013), with ~14,000 entries. Available via [[JULIELab/XANEW](https://github.com/JULIELab/XANEW)].
-  - **NRC-VAD**, with ~20,000 English words.
+  - (**NRC-VAD**)[https://saifmohammad.com/WebPages/nrc-vad.html], updated in 2025, with ~50,000 English words.
   - **EmoBank**, which provides sentence-level VAD annotations—useful for contextual analysis but not directly for sense definitions.
 
 For each sense definition, the keywords are matched against a VAD lexicon. If multiple matches are found, the average VAD values are used to approximate the emotion of that sense.
+In this first iteration we have used **NRC-VAD** lexicon.
 
 ---
 
