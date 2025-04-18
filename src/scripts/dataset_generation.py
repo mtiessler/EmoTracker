@@ -128,6 +128,7 @@ def generate_temporal_vad_dataset(sense_data_path, vad_lexicon_path, output_path
         if not valid_senses_found:
              logging.warning(f"Word '{word}': No valid senses found. Skipping.")
              words_to_remove.append(word)
+
     # Remove words with no processable senses
     for word in words_to_remove:
         if word in sense_data: del sense_data[word]
