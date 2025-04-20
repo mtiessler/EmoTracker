@@ -1,0 +1,39 @@
+.viz-control-group {
+  width: 100%;
+
+  .viz-button-container {
+    margin: -0.2rem;
+
+    .viz-button {
+      font-size: 0.78rem;
+      margin: 0.2rem;
+      padding: 0.3rem 0.6rem;
+      flex-grow: 1;
+      min-width: calc(25% - 0.4rem);
+
+      &.btn-outline-secondary {
+        color: var(--bs-secondary-color, #6c757d);
+        border-color: var(--bs-secondary-border-subtle, #dee2e6);
+
+        &:hover:not(:disabled) {
+          background-color: var(--bs-secondary-bg, #e9ecef);
+          color: var(--bs-secondary-color, #6c757d);
+        }
+      }
+
+      &.btn-primary {
+        color: var(--bs-btn-active-color, #fff);
+      }
+
+      &:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        &.btn-primary {
+          background-color: var(--bs-primary, #0d6efd);
+          border-color: var(--bs-primary, #0d6efd);
+          color: var(--bs-btn-active-color, #fff);
+        }
+      }
+    }
+  }
+}
