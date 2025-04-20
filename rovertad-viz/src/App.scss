@@ -1,44 +1,131 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
+@import "bootstrap/scss/bootstrap";
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #212529;
+  display: flex;
+  flex-direction: column;
+}
 
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.app-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.app-title {
   text-align: center;
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  color: #0d6efd;
+  flex-shrink: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.main-content-area {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.app-alert {
+  flex-shrink: 0;
+  .alert-heading {
+    font-size: 1rem;
+    font-weight: 600;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  p.small {
+    font-size: 0.875rem;
   }
 }
 
-.card {
-  padding: 2em;
+.file-upload-wrapper {
+  margin-bottom: 1rem;
+}
+.loading-indicator {
+  margin-bottom: 1rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+  padding: 0.25rem;
 }
 
-.read-the-docs {
-  color: #888;
+.selection-controls-card {
+  .card-body {
+    > * + * {
+      margin-top: 1rem;
+    }
+  }
+}
+
+.placeholder-card,
+.visualization-card {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .card-body {
+    flex-grow: 1;
+  }
+}
+
+.placeholder-card {
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #6c757d;
+  }
+  .placeholder-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+  h4 {
+    font-size: 1.1rem;
+    color: #495057;
+    margin-bottom: 0.5rem;
+  }
+  p {
+    font-size: 0.9rem;
+  }
+}
+
+.plot-card-footer {
+  min-height: 2.75rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+  border-top: 1px solid #dee2e6;
+  width: 100%;
+  flex-shrink: 0;
 }
