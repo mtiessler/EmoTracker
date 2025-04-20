@@ -1,8 +1,9 @@
+
 export interface TemporalVAD {
-  x: number[];
-  v: number[];
-  a: number[];
-  d: number[];
+  x: number[]; // Years/Time steps
+  v: number[]; // Valence
+  a: number[]; // Arousal
+  d: number[]; // Dominance
 }
 
 export interface SenseInfo {
@@ -18,7 +19,7 @@ export interface WordSenses {
 export interface SpectrogramData {
   years: number[];
   sense_ids: string[];
-  proportions_matrix: number[][];
+  proportions_matrix: number[][]; // [sense][year]
 }
 
 export interface WordData {
@@ -31,4 +32,14 @@ export interface LoadedData {
   [word: string]: WordData;
 }
 
-export type VizType = '2D-V' | '2D-A' | '2D-D' | '2D-VAD' | '3D' | '4D' | 'Spectrogram';
+export type VizType = '2D-V' | '2D-A' | '2D-D' | '2D-VAD' | '3D' | '4D';
+
+export interface CombinedDataPoint {
+  time: number;
+  [dataKey: string]: number | null;
+}
+
+export interface OptionType {
+  value: string;
+  label: string;
+}
