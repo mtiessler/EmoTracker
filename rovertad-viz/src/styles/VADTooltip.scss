@@ -1,0 +1,32 @@
+.vad-custom-tooltip {
+  padding: 0.6rem 0.9rem; // Increased padding
+  font-size: 0.82rem; // Slightly larger base font
+  line-height: 1.45; // Slightly increased line height
+
+  .label {
+    font-weight: 600;
+    margin-bottom: 0.5rem; // More space below label
+    color: var(--text-color, #212529);
+  }
+
+  .desc {
+    margin-bottom: 0.25rem; // Slightly more space between lines
+    font-weight: 500;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .qualitative {
+      font-weight: 400;
+      color: var(--text-muted-color, #6c757d);
+      margin-left: 0.4em; // Slightly more space
+    }
+
+    &.proportion {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--text-muted-color);
+    }
+  }
+}
