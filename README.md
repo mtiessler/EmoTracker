@@ -82,6 +82,14 @@ We provide a React frontend to explore word-level VAD trajectories over time. Us
 
 **\[Word: Gay in 2010]**
 ![img.png](data/imgs/new_drift.png)
+
+
+**\[VAD 2D Visualizator]**
+![img.png](data/imgs/vad.png)
+
+**\[Valence 2D Visualizator]**
+![img.png](data/imgs/v_exp.png)
+
 ---
 
 ## Project Structure
