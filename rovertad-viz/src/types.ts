@@ -1,3 +1,4 @@
+// src/types.ts
 
 export interface TemporalVAD {
   x: number[]; // Years/Time steps
