@@ -1,6 +1,8 @@
 
 # EmoTracker
-EmoTracker is a framework for modeling how emotional associations of words—represented by Valence, Arousal, and Dominance (VAD)—evolve over time. Unlike traditional emotion lexicons that treat word affect as static, EmoTracker combines **sense-aware temporal embeddings** with the **NRC-VAD lexicon** to infer diachronic emotional trajectories for English words.
+EmoTracker is a framework for modeling how emotional associations of words (represented by Valence, Arousal, and Dominance (VAD)) evolve over time. 
+
+Unlike traditional emotion lexicons that treat word affect as static, EmoTracker combines **sense-aware temporal embeddings** with the **NRC-VAD lexicon** to infer diachronic emotional trajectories for English words.
 
 We release:
 
@@ -15,7 +17,7 @@ Words like *gay*, *virus*, and *liberal* have undergone emotional and semantic s
 
 * *gay* → Valence: 8.5, Arousal: 5.3, Dominance: 6.0 (unchanging)
 
-However, emotional meanings shift over time along with senses. RoVERTaD aims to model:
+However, emotional meanings shift over time along with senses. EmoTracker aims to model:
 
 ```
 VAD(w, t) = f(w, t, s_t)     where s_t is the dominant sense of w at time t
