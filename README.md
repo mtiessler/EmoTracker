@@ -5,7 +5,6 @@ EmoTracker is a framework for modeling how emotional associations of words—rep
 We release:
 
 * A synthetic diachronic VAD dataset generated using sense clusters from Hu et al. (2019) and interpolated NRC-VAD values.
-* A RoBERTa-based regressor trained to predict VAD scores given historical context.
 * A visualization dashboard to explore VAD trends across decades.
 
 ---
@@ -49,6 +48,7 @@ Where `n_i` are the k nearest neighbors from the NRC-VAD space.
 VAD(w, t) = sum_s p(s_t) * VAD(w, t, s)
 ```
 **\[State of the art datasets]**
+
 **![Data Timeline](data/imgs/data_timeline.png)**
 
 ---
