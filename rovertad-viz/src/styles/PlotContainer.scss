@@ -1,0 +1,148 @@
+.plot-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%; // Ensure card fills its column space
+  overflow: hidden; // Prevent content overflow issues
+
+  .card-header {
+    flex-shrink: 0; // Prevent header from shrinking
+    font-weight: 500;
+    padding: 0.65rem 1rem;
+    background-color: var(--bs-tertiary-bg, #f8f9fa); // Subtle header background
+    border-bottom: 1px solid var(--card-border-color, #dee2e6);
+  }
+
+  .plot-container-body {
+    flex-grow: 1; // Take available vertical space
+    position: relative; // For positioning notice absolutely
+    padding: 0; // Remove padding, let plot component manage it
+    display: flex; // Use flex to help center placeholder content
+    flex-direction: column; // Stack content vertically
+
+    // Style for the actual plot components (assuming they render inside a div)
+    > div:first-child { // Target the first child div holding the plot/placeholder
+      flex-grow: 1; // Allow plot/placeholder div to fill space
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden; // Hide potential plot overflow
+    }
+
+    // Styling for placeholder text/elements within the body (Updated)
+    .placeholder-content {
+      padding: 2rem 1rem; // Increased padding for more space
+      text-align: center;
+      color: var(--text-muted-color, #6c757d);
+      display: flex;         // Use flexbox for alignment
+      flex-direction: column; // Stack elements vertically
+      align-items: center;    // Center horizontally
+      justify-content: center; // Center vertically
+      height: 100%;          // Ensure it fills the container body space
+
+      h4 {
+        font-size: 1.15rem; // Slightly larger heading
+        color: var(--bs-secondary-color, #5c677d); // Slightly softer than default text but not fully muted
+        margin-top: 1.25rem; // More space above heading
+        margin-bottom: 0.6rem; // Slightly more space below heading
+        font-weight: 500;
+      }
+
+      p {
+        font-size: 0.9rem;
+        max-width: 80%; // Prevent text from getting too wide
+        line-height: 1.5;
+      }
+
+      .placeholder-icon {
+        // Size is set in JSX (e.g., size={2}), color adjusted here or via class
+        margin-bottom: 0; // Remove default bottom margin as h4 margin-top handles spacing
+        // Optional: Adjust color/opacity if needed
+        // color: var(--accent-color, #0d6efd);
+        // opacity: 0.8;
+      }
+
+      // Optional: Add a subtle background or border for the info state
+      &.info {
+        .placeholder-icon {
+          color: var(--text-muted-color, #6c757d); // Ensure info icon uses muted color by default
+          opacity: 0.7;
+        }
+        // background-color: rgba(var(--bs-primary-rgb), 0.03); // Very subtle background tint
+        // border: 1px dashed var(--card-border-color, #dee2e6);
+        // border-radius: var(--bs-border-radius-lg); // Match card radius if desired
+      }
+
+      &.error-content {
+        .placeholder-icon {
+          color: var(--bs-danger-text-emphasis, #842029); // Example for danger
+          margin-bottom: 1rem; // Reset margin for error icon if needed
+          opacity: 0.8;
+        }
+        h4 {
+          color: var(--bs-danger-text-emphasis, #842029);
+        }
+      }
+      // Add similar &.warning {} block if needed
+    }
+
+
+    .plot-notice {
+      position: absolute;
+      bottom: 0.75rem;
+      right: 0.75rem;
+      z-index: 10;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      max-width: calc(100% - 1.5rem); // Prevent overflow
+      border-radius: var(--bs-border-radius-sm, 0.25rem);
+      box-shadow: var(--bs-box-shadow-sm);
+
+      // Ensure icon aligns well
+      svg {
+        vertical-align: text-bottom;
+        margin-bottom: -1px; // Fine-tune alignment
+      }
+    }
+  }
+
+  .plot-card-footer {
+    flex-shrink: 0; // Prevent footer from shrinking
+    background-color: var(--bs-tertiary-bg, #f8f9fa); // Match header bg
+    border-top: 1px solid var(--card-border-color, #dee2e6);
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    min-height: 3rem; // Ensure consistent height
+    display: flex;
+    align-items: center;
+
+    .sense-info-box {
+      width: 100%;
+      line-height: 1.4;
+      display: grid; // Use grid for alignment
+      grid-template-columns: auto 1fr; // Label and Value columns
+      gap: 0.1rem 0.5rem; // Row and Column gaps
+
+      div > strong {
+        color: var(--bs-secondary-color, #6c757d); // Slightly style label
+        margin-right: 0.3em;
+      }
+      div > span {
+        word-break: break-word; // Break long definitions/IDs
+      }
+    }
+
+    .sense-info-placeholder {
+      min-height: 1.5em; // Maintain some height even when empty
+      width: 100%;
+    }
+  }
+
+  // Specific header style for data errors
+  .error-header {
+    background-color: var(--bs-danger-bg-subtle, #f8d7da);
+    border-bottom-color: var(--bs-danger-border-subtle, #f5c2c7);
+    color: var(--bs-danger-text-emphasis, #842029);
+    font-weight: 500;
+  }
+
+}
