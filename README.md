@@ -146,16 +146,3 @@ npm install && npm start
 * Mohammad (2018). *Obtaining Reliable Human Ratings of Valence, Arousal, and Dominance for 20,000 English Words*. LREC 2018. [Link](https://aclanthology.org/L18-1191)
 
 ---
-
-## Citation
-
-If you use RoVERTaD, please cite:
-
-```bibtex
-@inproceedings{rovertad2025,
-  title={RoVERTaD: VAD Inference Over Time with Diachronic Sense Modeling},
-  author={Your Name and Collaborators},
-  booktitle={ACL 2025 (Short Paper)},
-  year={2025}
-}
-```
