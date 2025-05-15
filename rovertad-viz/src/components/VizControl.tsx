@@ -2,7 +2,7 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import { VizType } from '../types';
 
-import '../styles/VizControl.scss';
+import '../styles/VizControl.scss'; // Corrected path
 
 interface VizControlProps {
     selectedViz: VizType;
@@ -18,6 +18,7 @@ const VIZ_OPTIONS: { label: string; type: VizType }[] = [
     { label: '2D VAD', type: '2D-VAD' },
     { label: '3D', type: '3D' },
     { label: '4D', type: '4D' },
+    // { label: 'Heatmap', type: 'Spectrogram' }, // Removed
 ];
 
 const VizControl: React.FC<VizControlProps> = ({ selectedViz, onChange, disabled, className }) => {
