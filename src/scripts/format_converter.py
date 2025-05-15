@@ -24,14 +24,6 @@ def get_file_paths():
 
 
 def convert_pickle_to_json(pickle_path, json_path):
-    """
-    Reads data from a Python pickle file and writes it to a JSON file.
-    Logs errors to stderr, but is otherwise silent.
-
-    Args:
-        pickle_path (str): The full, platform-agnostic path to the input pickle file.
-        json_path (str): The full, platform-agnostic path to the output JSON file.
-    """
     data = None
     try:
         with open(pickle_path, 'rb') as infile:
