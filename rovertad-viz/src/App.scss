@@ -1,5 +1,13 @@
 @import "bootstrap/scss/bootstrap";
 
+// Define reusable variables (consider moving to index.css or a variables file)
+:root {
+  --app-title-color: #2a7ce7; // A slightly different blue
+  --app-title-hover-color: #1a5bb7;
+  --footer-text-color: #86909c; // A lighter gray for muted footer text
+}
+
+
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -7,8 +15,8 @@ html, body, #root {
 }
 
 body {
-  background-color: #f8f9fa;
-  color: #212529;
+  background-color: #f8f9fa; // Use var(--bg-color) if defined in index.css
+  color: #212529; // Use var(--text-color) if defined in index.css
   display: flex;
   flex-direction: column;
 }
@@ -24,22 +32,30 @@ body {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  // Removed min-height: 100vh based on previous request
 }
 
 .app-title {
   text-align: center;
-  font-size: 1.8rem;
-  font-weight: 500;
-  margin-top: 1.5rem;
-  margin-bottom: 2rem;
-  color: #0d6efd;
+  font-size: 2rem; // Slightly larger font size
+  font-weight: 600; // Slightly bolder
+  margin-top: 2rem; // Increased top margin
+  margin-bottom: 2.5rem; // Increased bottom margin
+  color: var(--app-title-color); // Use variable for color
+  letter-spacing: 0.5px; // Subtle letter spacing
+  text-transform: uppercase; // Uppercase transform
+  transition: color 0.2s ease-in-out;
   flex-shrink: 0;
+
+  &:hover {
+    color: var(--app-title-hover-color); // Subtle hover effect
+  }
 }
 
 .main-content-area {
   flex-grow: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; // Keep this to manage the Row layout
 }
 
 .app-alert {
@@ -108,7 +124,7 @@ body {
   }
 }
 
-.plot-card-footer {
+.plot-card-footer { // Assuming this is styled in PlotContainer.scss, remove/adjust if needed
   min-height: 2.75rem;
   font-size: 0.85rem;
   color: #6c757d;
@@ -122,10 +138,11 @@ body {
 
 .app-footer {
   text-align: center;
-  padding: 1rem 0;
-  font-size: 0.85rem;
-  color: #6c757d;
-  border-top: 1px solid #dee2e6;
+  padding: 1.5rem 0; // Increased vertical padding inside footer
+  font-size: 0.8rem; // Slightly smaller font size
+  color: var(--footer-text-color); // Use variable for lighter color
+  border-top: 1px solid var(--card-border-color, #dee2e6);
   width: 100%;
   flex-shrink: 0;
+  margin-top: 3rem; // Increased margin-top for more space above footer
 }
