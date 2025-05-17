@@ -4,8 +4,10 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Input
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 import pickle
 import logging
+import math
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -111,7 +113,7 @@ def create_sequences_and_clean(ml_ready_data_path, lookback_window, forecast_hor
 
 
 def train_and_evaluate_lstm(ml_ready_data_path, lookback_param, forecast_horizon_param, train_until_year_param,
-                            num_features=3):
+                            num_features=3, num_examples_to_show=5):
     X_train, y_train, X_test, y_test, lookback_window_from_seq = create_sequences_and_clean(
         ml_ready_data_path,
         lookback_param,
@@ -136,6 +138,8 @@ def train_and_evaluate_lstm(ml_ready_data_path, lookback_param, forecast_horizon
     for i in range(num_features):
         y_train_scaled[:, i:i + 1] = scalers[i].transform(y_train[:, i:i + 1])
 
+    X_test_scaled = np.array([])
+    y_test_scaled = np.array([])
     if X_test.size > 0:
         X_test_reshaped = X_test.reshape(-1, num_features)
         X_test_scaled_reshaped = np.zeros_like(X_test_reshaped)
@@ -143,11 +147,10 @@ def train_and_evaluate_lstm(ml_ready_data_path, lookback_param, forecast_horizon
             X_test_scaled_reshaped[:, i:i + 1] = scalers[i].transform(X_test_reshaped[:, i:i + 1])
         X_test_scaled = X_test_scaled_reshaped.reshape(X_test.shape)
 
-        y_test_scaled = np.zeros_like(y_test)
-        for i in range(num_features):
-            y_test_scaled[:, i:i + 1] = scalers[i].transform(y_test[:, i:i + 1])
-    else:
-        X_test_scaled, y_test_scaled = np.array([]), np.array([])
+        if y_test.size > 0:  # y_test should also exist if X_test exists
+            y_test_scaled = np.zeros_like(y_test)
+            for i in range(num_features):
+                y_test_scaled[:, i:i + 1] = scalers[i].transform(y_test[:, i:i + 1])
 
     model = Sequential([
         Input(shape=(lookback_window_from_seq, num_features)),
@@ -166,10 +169,45 @@ def train_and_evaluate_lstm(ml_ready_data_path, lookback_param, forecast_horizon
     )
 
     if X_test_scaled.size > 0 and y_test_scaled.size > 0:
-        test_loss = model.evaluate(X_test_scaled, y_test_scaled, verbose=0)
-        print(f"Test MSE (LSTM): {test_loss}")
+        test_loss_scaled = model.evaluate(X_test_scaled, y_test_scaled, verbose=0)
+        print(f"\n--- Model Evaluation Summary ---")
+        print(f"Test MSE (on scaled data): {test_loss_scaled:.8f}")
+
+        predictions_scaled = model.predict(X_test_scaled)
+
+        predictions_unscaled = np.zeros_like(predictions_scaled)
+        y_test_unscaled = np.zeros_like(y_test)
+
+        for i in range(num_features):
+            predictions_unscaled[:, i] = scalers[i].inverse_transform(predictions_scaled[:, i].reshape(-1, 1)).flatten()
+            y_test_unscaled[:, i] = scalers[i].inverse_transform(
+                y_test_scaled[:, i].reshape(-1, 1)).flatten()
+        y_test_unscaled = y_test
+
+        overall_mae_unscaled = mean_absolute_error(y_test_unscaled, predictions_unscaled)
+        overall_rmse_unscaled = math.sqrt(mean_squared_error(y_test_unscaled, predictions_unscaled))
+        print(f"Test MAE (on unscaled data, overall): {overall_mae_unscaled:.8f}")
+        print(f"Test RMSE (on unscaled data, overall): {overall_rmse_unscaled:.8f}")
+
+        for i, dim in enumerate(['V', 'A', 'D']):
+            dim_mae = mean_absolute_error(y_test_unscaled[:, i], predictions_unscaled[:, i])
+            dim_rmse = math.sqrt(mean_squared_error(y_test_unscaled[:, i], predictions_unscaled[:, i]))
+            print(f"  {dim} - MAE (unscaled): {dim_mae:.8f}, RMSE (unscaled): {dim_rmse:.8f}")
+
+        print(f"\n--- Examples of Predicted vs. Actual VAD values (Test Set, Unscaled) ---")
+        num_to_display = min(num_examples_to_show, len(predictions_unscaled))
+        if num_to_display == 0:
+            print("No test examples to display.")
+        for i in range(num_to_display):
+            pred_v, pred_a, pred_d = predictions_unscaled[i]
+            actual_v, actual_a, actual_d = y_test_unscaled[i]
+            print(f"Example {i + 1}:")
+            print(f"  Predicted: V={pred_v:.4f}, A={pred_a:.4f}, D={pred_d:.4f}")
+            print(f"  Actual:    V={actual_v:.4f}, A={actual_a:.4f}, D={actual_d:.4f}")
+            print("-" * 20)
+
     else:
-        print("\nNo test data to evaluate for LSTM.")
+        print("\nNo test data to evaluate or display examples for LSTM.")
 
     model.save('lstm_vad_model.keras')
     with open('vad_scalers.pkl', 'wb') as f:
@@ -183,12 +221,14 @@ if __name__ == "__main__":
     LOOKBACK_PARAM = 4
     FORECAST_HORIZON_PARAM = 1
     TRAIN_UNTIL_YEAR_PARAM = 1980
+    EXAMPLES_TO_SHOW = 5
 
     trained_lstm_model, training_history = train_and_evaluate_lstm(
         ml_ready_data_file,
         LOOKBACK_PARAM,
         FORECAST_HORIZON_PARAM,
-        TRAIN_UNTIL_YEAR_PARAM
+        TRAIN_UNTIL_YEAR_PARAM,
+        num_examples_to_show=EXAMPLES_TO_SHOW
     )
     if trained_lstm_model:
         print("LSTM model training and evaluation finished.")
