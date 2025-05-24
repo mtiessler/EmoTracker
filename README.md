@@ -1,4 +1,3 @@
-
 # EmoTracker
 EmoTracker is a framework for modeling how emotional associations of words (represented by Valence, Arousal, and Dominance (VAD)) evolve over time. 
 
@@ -57,7 +56,64 @@ VAD(w, t) = sum_s p(s_t) * VAD(w, t, s)
 
 ## Model Architecture
 
-**still in progress**...
+### Enhanced LSTM VAD Forecaster
+
+EmoTracker employs an advanced deep learning model that combines **LSTM neural networks** with **sophisticated momentum feature engineering** and **attention mechanisms** to capture complex temporal patterns in emotional word semantics.
+
+#### Core Components
+
+**1. Enhanced LSTM with Attention**
+- Multi-layer LSTM with configurable hidden dimensions (default: 128)
+- Multi-head self-attention mechanism (8 heads)
+- Layer normalization and residual connections
+- Input projection for optimal feature transformation
+
+**2. Advanced Momentum Features**
+
+The model computes **8 momentum features** per VAD dimension, totaling **27 input features** per timestep:
+
+- **Base Features (3)**: VAD difference values (Δv, Δa, Δd)
+- **Momentum Features (24)**: 8 metrics × 3 VAD dimensions
+  - **Velocity**: Linear regression slope indicating trend direction/speed
+  - **Acceleration**: Second derivative capturing rate of change in velocity
+  - **Trend Strength**: R-value weighted by direction for consistency
+  - **Volatility**: Standard deviation measuring uncertainty/variability
+  - **Momentum Oscillator**: Recent change relative to historical volatility
+  - **Relative Strength**: First vs second half comparison within window
+  - **Range Position**: Current value position within historical min/max range
+  - **EMA Ratio**: Exponential vs Simple Moving Average relationship
+
+**3. Architecture Overview**
+
+
+**![Model Architecture](data/imgs/lstm.png)**
+
+---
+#### Training Pipeline
+
+The model uses difference-based modeling for temporal trajectory modelling:
+
+```
+VAD_pred(t+1) = VAD_actual(t) + Δ_pred(t+1)
+```
+
+Where `Δ_pred(t+1)` is the predicted change in VAD values.
+
+**Training Configuration:**
+- **Lookback Window**: 15 timesteps
+- **Optimizer**: AdamW with weight decay (1e-5)
+- **Learning Rate**: 0.0005 with ReduceLROnPlateau scheduling
+- **Regularization**: Dropout (0.2), gradient clipping (1.0)
+- **Early Stopping**: Patience of 10 epochs on validation loss
+
+#### Key Advantages
+
+- **Rich Temporal Modeling**: 8 sophisticated momentum features vs simple difference concatenation
+- **Long-Range Dependencies**: Multi-head attention captures sequence relationships
+- **Robust Training**: Early stopping, gradient clipping, best model saving
+- **Production Ready**: Complete model persistence with scalers and configuration
+
+The LSTM forecaster allows modeling of how word emotions evolve across historical periods, capturing both linear trends and complex non-linear patterns in VAD trajectories.
 
 ---
 
@@ -68,6 +124,7 @@ We evaluate on:
 * Pearson and Spearman correlation with gold VAD values (static NRC-VAD and synthetic)
 * Generalization across decades (train on 1850–1950, test on 1960–2000)
 * Case studies: *gay*, *queer*, *liberal*, *pandemic*
+* **LSTM Performance**: MAE and RMSE on reconstructed VAD values across test periods
 
 ---
 
@@ -102,6 +159,7 @@ EmoTracker/
 ├── data/
 │   ├── raw/                 # Hu et al.'s sense data
 │   ├── processed/           # Generated diachronic VAD dataset
+│   └── Generated_VAD_Dataset/  # LSTM training data
 │
 ├── vad_generator/           # Scripts to compute temporal VAD
 │   └── generate_vad.py
@@ -109,6 +167,10 @@ EmoTracker/
 ├── model/                   # RoBERTa training + inference
 │   ├── train.py
 │   └── vad_model.py
+│
+├── lstm_forecaster/         # Enhanced LSTM VAD prediction
+│   ├── enhanced_lstm_vad_forecaster.py
+│   └── model_assets_pytorch/   # Trained models and configs
 │
 ├── dashboard/               # React-based VAD visualizer
 │   └── src/
@@ -133,13 +195,19 @@ pip install -r requirements.txt
 python vad_generator/generate_vad.py
 ```
 
-3. Train the RoBERTa model:
+3. Train the Enhanced LSTM model:
+
+```bash
+python lstm_forecaster/enhanced_lstm_vad_forecaster.py
+```
+
+4. Train the RoBERTa model:
 
 ```bash
 python model/train.py --epochs 5
 ```
 
-4. Launch the visualization dashboard:
+5. Launch the visualization dashboard:
 
 ```bash
 cd dashboard/
