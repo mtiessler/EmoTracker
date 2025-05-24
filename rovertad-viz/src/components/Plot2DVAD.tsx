@@ -80,7 +80,7 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
         selectedWords.forEach((word, wordIndex) => {
             const wordData = allWordsData[word];
             if (!wordData?.temporal_vad?.x || !wordData?.temporal_vad?.v || !wordData?.temporal_vad?.a || !wordData?.temporal_vad?.d) {
-                console.warn(`Missing VAD data for word: ${word}`);
+                // console.warn(`Missing VAD data for word: ${word}`);
                 return;
             }
 
@@ -89,7 +89,7 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
             if (!timeRef) {
                 timeRef = x;
             } else if (JSON.stringify(timeRef) !== JSON.stringify(x)) {
-                console.warn(`Time data mismatch for word: ${word}. Skipping.`);
+                // console.warn(`Time data mismatch for word: ${word}. Skipping.`);
                 return;
             }
 
