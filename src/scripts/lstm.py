@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 PYTORCH_MODEL_FILENAME = 'lstm_vad_model_pytorch.pth'
 SCALERS_PICKLE_FILENAME = 'vad_scalers_pytorch.pkl'
-MODEL_ASSETS_DIR = os.path.join('..','..','model_assets_pytorch')
+MODEL_ASSETS_DIR = os.path.join('..', '..', 'model_assets_pytorch')
 BACKEND_CONFIG_FILENAME = os.path.join(MODEL_ASSETS_DIR, 'backend_model_config_pytorch.json')
 
 
