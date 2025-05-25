@@ -61,9 +61,7 @@ From the project root directory:
 cd api
 pip install -r requirements.txt
 
-# Run the application
-flask run
-# OR using WSGI
+# run
 python wsgi.py
 ```
 
@@ -163,7 +161,7 @@ Content-Type: application/json
 ### Running the API Locally
 ```bash
 cd api
-flask run 
+python wsgi.py 
 ```
 
 ## Performance Metrics
