@@ -1,29 +1,31 @@
-// src/components/Plot3D4D.tsx
 import React, { useMemo } from 'react';
 import Plot from 'react-plotly.js';
 import type { Data, Layout, Font, ColorBar, Annotations } from 'plotly.js';
 import Icon from '@mdi/react';
 import { mdiAlertCircleOutline } from '@mdi/js';
-import { LoadedData } from '../types';
-import { getVADDescription, VADDimension } from '../vadUtils'; // Corrected path
+import { LoadedData, PredictedVadPoint } from '../types';
+import { getVADDescription } from '../vadUtils';
 
-import '../styles/Plot3D4D.scss'; // Corrected path
+import '../styles/Plot3D4D.scss';
 
 interface Plot3D4DProps {
     selectedWords: string[];
     allWordsData: LoadedData | null;
-    senseProportions?: number[] | null;
+    senseProportions?: (number | null)[] | null;
     is4D?: boolean;
+    predictedVadSeries?: PredictedVadPoint[] | null;
 }
 
 const createHoverTextWithDescPlain = (
     time: number[] | undefined,
-    v: number[] | undefined,
-    a: number[] | undefined,
-    d: number[] | undefined,
-    word: string
+    v: (number | null)[] | undefined,
+    a: (number | null)[] | undefined,
+    d: (number | null)[] | undefined,
+    word: string,
+    isForecast: boolean = false
 ): string[] => {
     if (!time || !v || !a || !d) return [];
+    const forecastLabel = isForecast ? " (Forecast)" : "";
     return time.map((t, i) => {
         const vVal = v[i];
         const aVal = a[i];
@@ -32,7 +34,7 @@ const createHoverTextWithDescPlain = (
         const aDesc = getVADDescription('Arousal', aVal);
         const dDesc = getVADDescription('Dominance', dVal);
 
-        return `<b>Word: ${word} | Year: ${t}</b><br>` +
+        return `<b>Word: ${word}${forecastLabel} | Year: ${t}</b><br>` +
             `V: ${vVal?.toFixed(3) ?? 'N/A'} ${vDesc ? `(${vDesc})` : ''}<br>` +
             `A: ${aVal?.toFixed(3) ?? 'N/A'} ${aDesc ? `(${aDesc})` : ''}<br>` +
             `D: ${dVal?.toFixed(3) ?? 'N/A'} ${dDesc ? `(${dDesc})` : ''}`;
@@ -62,27 +64,24 @@ const HOVER_FONT: Partial<Font> = { family: FONT_FAMILY, size: 12.8, color: TEXT
 const ANNOTATION_FONT: Partial<Font> = { family: FONT_FAMILY, size: 9, color: ANNOTATION_COLOR };
 
 const traceColors = ['#0d6efd', '#dc3545', '#198754', '#ffc107', '#6f42c1', '#fd7e14', '#20c997', '#6610f2'];
+const forecastLineStyle3D = { dash: 'dash' as const, width: 1.5 };
 
-const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseProportions = null, is4D = false }) => {
+
+const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseProportions = null, is4D = false, predictedVadSeries }) => {
 
     const plotMemoData = useMemo(() => {
         const traces: Data[] = [];
         let hasValidData = false;
         const annotations: Partial<Annotations>[] = [];
-        let dataRanges = {
-            x: [0.5, 0.5] as [number, number],
-            y: [0.5, 0.5] as [number, number],
-            z: [0.5, 0.5] as [number, number]
-        };
+        const allV_plot: number[] = [];
+        const allA_plot: number[] = [];
+        const allD_plot: number[] = [];
 
         if (!allWordsData || selectedWords.length === 0) {
-            return { traces, hasValidData, annotations, dataRanges };
+            return { traces, hasValidData, annotations, dataRanges: { x: [0,1] as [number,number], y: [0,1] as [number,number], z: [0,1] as [number,number] } };
         }
 
-        const canShow4D = is4D && selectedWords.length === 1 && Array.isArray(senseProportions) && senseProportions.length > 0;
-        const allV: number[] = [];
-        const allA: number[] = [];
-        const allD: number[] = [];
+        const canShow4D = is4D && selectedWords.length === 1 && Array.isArray(senseProportions) && senseProportions.some(p => p !== null);
 
         selectedWords.forEach((word, index) => {
             const wordData = allWordsData[word];
@@ -94,16 +93,24 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
             const { x: time, v, a, d } = wordData.temporal_vad;
             const traceColor = traceColors[index % traceColors.length];
             const dataLength = Math.min(time.length, v.length, a.length, d.length);
-            const vData = v.slice(0, dataLength);
-            const aData = a.slice(0, dataLength);
-            const dData = d.slice(0, dataLength);
+
+            const vData = v.slice(0, dataLength).filter((val): val is number => typeof val === 'number' && !isNaN(val));
+            const aData = a.slice(0, dataLength).filter((val): val is number => typeof val === 'number' && !isNaN(val));
+            const dData = d.slice(0, dataLength).filter((val): val is number => typeof val === 'number' && !isNaN(val));
             const timeData = time.slice(0, dataLength);
 
-            allV.push(...vData.filter((val): val is number => typeof val === 'number' && !isNaN(val)));
-            allA.push(...aData.filter((val): val is number => typeof val === 'number' && !isNaN(val)));
-            allD.push(...dData.filter((val): val is number => typeof val === 'number' && !isNaN(val)));
+            const validIndices = time.map((_,i) => v[i] !== null && a[i] !== null && d[i] !== null).reduce((acc, cur, i) => cur ? [...acc, i] : acc, [] as number[]);
+            const filteredV = validIndices.map(i => v[i] as number);
+            const filteredA = validIndices.map(i => a[i] as number);
+            const filteredD = validIndices.map(i => d[i] as number);
+            const filteredTime = validIndices.map(i => time[i]);
 
-            const hoverText = createHoverTextWithDescPlain(timeData, vData, aData, dData, word);
+
+            allV_plot.push(...filteredV);
+            allA_plot.push(...filteredA);
+            allD_plot.push(...filteredD);
+
+            const hoverText = createHoverTextWithDescPlain(filteredTime, filteredV, filteredA, filteredD, word);
             const showTimeColorbar = !canShow4D && selectedWords.length <= 1;
 
             const colorbarOptions: Partial<ColorBar> | undefined = (canShow4D || showTimeColorbar) ? {
@@ -116,9 +123,9 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
             } : undefined;
 
             traces.push({
-                x: vData,
-                y: aData,
-                z: dData,
+                x: filteredV,
+                y: filteredA,
+                z: filteredD,
                 mode: 'lines+markers',
                 type: 'scatter3d',
                 name: word,
@@ -131,7 +138,7 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
                 },
                 marker: {
                     size: selectedWords.length > 1 ? 3.5 : 4.5,
-                    color: canShow4D ? senseProportions?.slice(0, dataLength) : timeData,
+                    color: canShow4D ? senseProportions?.slice(0, filteredTime.length) : (showTimeColorbar ? filteredTime : traceColor),
                     colorscale: canShow4D ? SENSE_COLOR_SCALE : (showTimeColorbar ? TIME_COLOR_SCALE : undefined),
                     showscale: canShow4D || showTimeColorbar,
                     colorbar: colorbarOptions,
@@ -140,42 +147,96 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
             });
         });
 
-        if (hasValidData) {
-            const getMinMax = (vals: number[]): [number, number] => {
-                if (vals.length === 0) return [0, 1];
-                return [Math.min(...vals), Math.max(...vals)];
+        if (predictedVadSeries && selectedWords.length === 1 && traces.length > 0 && hasValidData) {
+            const word = selectedWords[0];
+            const actualTrace = traces.find(t => t.name === word);
+            const wordData = allWordsData?.[word]?.temporal_vad;
+
+            if (actualTrace && wordData && wordData.x.length > 0) {
+                const lastActualTime = wordData.x[wordData.x.length -1];
+                const lastActualV = wordData.v[wordData.v.length -1];
+                const lastActualA = wordData.a[wordData.a.length -1];
+                const lastActualD = wordData.d[wordData.d.length -1];
+
+                if (lastActualV !== null && lastActualA !== null && lastActualD !== null) {
+                    const forecastTimes = [lastActualTime, ...predictedVadSeries.map(p => p.time)];
+                    const forecastV = [lastActualV, ...predictedVadSeries.map(p => p.v)];
+                    const forecastA = [lastActualA, ...predictedVadSeries.map(p => p.a)];
+                    const forecastD = [lastActualD, ...predictedVadSeries.map(p => p.d)];
+
+                    allV_plot.push(...predictedVadSeries.map(p => p.v));
+                    allA_plot.push(...predictedVadSeries.map(p => p.a));
+                    allD_plot.push(...predictedVadSeries.map(p => p.d));
+
+                    const forecastHoverText = createHoverTextWithDescPlain(forecastTimes, forecastV, forecastA, forecastD, word, true);
+
+                    traces.push({
+                        x: forecastV,
+                        y: forecastA,
+                        z: forecastD,
+                        mode: 'lines+markers',
+                        type: 'scatter3d',
+                        name: `${word} (Forecast)`,
+                        text: forecastHoverText,
+                        hoverinfo: 'text',
+                        line: {
+                            color: actualTrace.line?.color || traceColors[0],
+                            width: forecastLineStyle3D.width,
+                            dash: forecastLineStyle3D.dash,
+                            smoothing: 1.0,
+                        },
+                        marker: {
+                            size: (actualTrace.marker?.size || 4.5) * 0.9,
+                            color: actualTrace.line?.color || traceColors[0],
+                            opacity: 0.9,
+                            symbol: 'diamond'
+                        },
+                        showlegend: true
+                    });
+                }
+            }
+        }
+
+        let dataRanges = { x: [0,1] as [number,number], y: [0,1] as [number,number], z: [0,1] as [number,number]};
+        if (hasValidData || (predictedVadSeries && predictedVadSeries.length > 0)) {
+            const getMinMaxWithFallback = (vals: number[], fallback: [number,number] = [0,1]): [number, number] => {
+                const numericVals = vals.filter(v => typeof v === 'number' && !isNaN(v));
+                if (numericVals.length === 0) return fallback;
+                const min = Math.min(...numericVals);
+                const max = Math.max(...numericVals);
+                return [min, max];
             };
-            dataRanges.x = getMinMax(allV);
-            dataRanges.y = getMinMax(allA);
-            dataRanges.z = getMinMax(allD);
+            dataRanges.x = getMinMaxWithFallback(allV_plot);
+            dataRanges.y = getMinMaxWithFallback(allA_plot);
+            dataRanges.z = getMinMaxWithFallback(allD_plot);
 
             const [xMin, xMax] = dataRanges.x;
             const [yMin, yMax] = dataRanges.y;
             const [zMin, zMax] = dataRanges.z;
-            const xOffset = Math.max(0.05, (xMax - xMin) * 0.05);
-            const yOffset = Math.max(0.05, (yMax - yMin) * 0.05);
-            const zOffset = Math.max(0.05, (zMax - zMin) * 0.05);
+            const xOffset = Math.max(0.05, (xMax - xMin) * 0.15);
+            const yOffset = Math.max(0.05, (yMax - yMin) * 0.15);
+            const zOffset = Math.max(0.05, (zMax - zMin) * 0.15);
 
+            annotations.length = 0;
             annotations.push(
-                { text: 'Pleasant', x: xMax + xOffset, y: yMin, z: zMin, showarrow: false, font: ANNOTATION_FONT, xanchor: 'left', yanchor: 'middle'},
-                { text: 'Unpleasant', x: xMin - xOffset, y: yMin, z: zMin, showarrow: false, font: ANNOTATION_FONT, xanchor: 'right', yanchor: 'middle' },
-                { text: 'Activated', x: xMin, y: yMax + yOffset, z: zMin, showarrow: false, font: ANNOTATION_FONT, xanchor: 'center', yanchor: 'bottom'},
-                { text: 'Calm', x: xMin, y: yMin - yOffset, z: zMin, showarrow: false, font: ANNOTATION_FONT, xanchor: 'center', yanchor: 'top'},
-                { text: 'In Control', x: xMin, y: yMin, z: zMax + zOffset, showarrow: false, font: ANNOTATION_FONT, xanchor: 'left', yanchor: 'middle'},
-                { text: 'Controlled', x: xMin, y: yMin, z: zMin - zOffset, showarrow: false, font: ANNOTATION_FONT, xanchor: 'left', yanchor: 'middle'},
+                { text: 'Pleasant', x: xMax + xOffset, y: (yMin + yMax) / 2, z: (zMin + zMax) / 2, showarrow: false, font: ANNOTATION_FONT, xanchor: 'left', yanchor: 'middle'},
+                { text: 'Unpleasant', x: xMin - xOffset, y: (yMin + yMax) / 2, z: (zMin + zMax) / 2, showarrow: false, font: ANNOTATION_FONT, xanchor: 'right', yanchor: 'middle' },
+                { text: 'Activated', x: (xMin + xMax) / 2, y: yMax + yOffset, z: (zMin + zMax) / 2, showarrow: false, font: ANNOTATION_FONT, xanchor: 'center', yanchor: 'bottom'},
+                { text: 'Calm', x: (xMin + xMax) / 2, y: yMin - yOffset, z: (zMin + zMax) / 2, showarrow: false, font: ANNOTATION_FONT, xanchor: 'center', yanchor: 'top'},
+                { text: 'In Control', x: (xMin + xMax) / 2, y: (yMin + yMax) / 2, z: zMax + zOffset, showarrow: false, font: ANNOTATION_FONT, xanchor: 'center', yanchor: 'middle', textangle: -90},
+                { text: 'Controlled', x: (xMin + xMax) / 2, y: (yMin + yMax) / 2, z: zMin - zOffset, showarrow: false, font: ANNOTATION_FONT, xanchor: 'center', yanchor: 'middle', textangle: -90},
             );
         }
+        return { traces, hasValidData: hasValidData || (predictedVadSeries && predictedVadSeries.length > 0 && selectedWords.length === 1), annotations, dataRanges };
 
-        return { traces, hasValidData, annotations, dataRanges };
-
-    }, [selectedWords, allWordsData, is4D, senseProportions]);
+    }, [selectedWords, allWordsData, is4D, senseProportions, predictedVadSeries]);
 
 
     if (selectedWords.length === 0) {
         return (
             <div className="plot-placeholder info">
                 <h4>Select Word(s)</h4>
-                <p>Select one or more words from the controls to view the 3D plot.</p>
+                <p>Select one or more words from the controls to view the 3D/4D plot.</p>
             </div>
         );
     }
@@ -185,10 +246,23 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
             <div className="plot-placeholder error">
                 <Icon path={mdiAlertCircleOutline} size={1.6} className="placeholder-icon" />
                 <h4>Data Error</h4>
-                <p>No valid VAD data found for the selected word(s).</p>
+                <p>No valid VAD data found for the selected word(s) to render the plot.</p>
             </div>
         );
     }
+
+    const calculateRangeWithPadding = (minMax: [number, number], factor = 0.1): [number, number] => {
+        const [min, max] = minMax;
+        if (min === max) return [min - 0.1, max + 0.1];
+        const range = max - min;
+        const padding = Math.max(0.05, range * factor);
+        return [min - padding, max + padding];
+    };
+
+    const xDisplayRange = calculateRangeWithPadding(plotMemoData.dataRanges.x);
+    const yDisplayRange = calculateRangeWithPadding(plotMemoData.dataRanges.y);
+    const zDisplayRange = calculateRangeWithPadding(plotMemoData.dataRanges.z);
+
 
     const commonAxisSettings = {
         backgroundcolor: AXIS_BG_COLOR,
@@ -198,6 +272,7 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
         tickfont: AXIS_TICK_FONT,
         linecolor: AXIS_LINE_COLOR,
         automargin: true,
+        autorange: false,
     };
 
     const layout: Partial<Layout> = {
@@ -205,7 +280,7 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
         height: undefined,
         width: undefined,
         margin: { l: 0, r: 0, b: 0, t: 0, pad: 4 },
-        showlegend: selectedWords.length > 1,
+        showlegend: selectedWords.length > 1 || (predictedVadSeries && selectedWords.length === 1),
         legend: {
             font: { size: 9 },
             yanchor: "top",
@@ -217,9 +292,9 @@ const Plot3D4D: React.FC<Plot3D4DProps> = ({ selectedWords, allWordsData, senseP
             borderwidth: 1
         },
         scene: {
-            xaxis: { ...commonAxisSettings, title: { text: 'Valence (V)', font: AXIS_TITLE_FONT } },
-            yaxis: { ...commonAxisSettings, title: { text: 'Arousal (A)', font: AXIS_TITLE_FONT } },
-            zaxis: { ...commonAxisSettings, title: { text: 'Dominance (D)', font: AXIS_TITLE_FONT } },
+            xaxis: { ...commonAxisSettings, title: { text: 'Valence (V)', font: AXIS_TITLE_FONT }, range: xDisplayRange },
+            yaxis: { ...commonAxisSettings, title: { text: 'Arousal (A)', font: AXIS_TITLE_FONT }, range: yDisplayRange },
+            zaxis: { ...commonAxisSettings, title: { text: 'Dominance (D)', font: AXIS_TITLE_FONT }, range: zDisplayRange },
             camera: { eye: { x: 1.6, y: 1.6, z: 1.6 } },
             aspectmode: 'cube',
             annotations: plotMemoData.annotations
