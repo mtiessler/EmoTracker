@@ -1,10 +1,9 @@
 @import "bootstrap/scss/bootstrap";
 
-// Define reusable variables (consider moving to index.css or a variables file)
 :root {
-  --app-title-color: #2a7ce7; // A slightly different blue
+  --app-title-color: #2a7ce7;
   --app-title-hover-color: #1a5bb7;
-  --footer-text-color: #86909c; // A lighter gray for muted footer text
+  --footer-text-color: #86909c;
 }
 
 
@@ -15,8 +14,8 @@ html, body, #root {
 }
 
 body {
-  background-color: #f8f9fa; // Use var(--bg-color) if defined in index.css
-  color: #212529; // Use var(--text-color) if defined in index.css
+  background-color: #f8f9fa;
+  color: #212529;
   display: flex;
   flex-direction: column;
 }
@@ -32,30 +31,121 @@ body {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  // Removed min-height: 100vh based on previous request
+}
+.hero-section {
+  text-align: center;
+  padding: 2rem 0 2.5rem 0;
+  position: relative;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(42, 124, 231, 0.08) 0%, transparent 60%);
+  border-radius: 50%;
+  z-index: -1;
 }
 
 .app-title {
-  text-align: center;
-  font-size: 2rem; // Slightly larger font size
-  font-weight: 600; // Slightly bolder
-  margin-top: 2rem; // Increased top margin
-  margin-bottom: 2.5rem; // Increased bottom margin
-  color: var(--app-title-color); // Use variable for color
-  letter-spacing: 0.5px; // Subtle letter spacing
-  text-transform: uppercase; // Uppercase transform
-  transition: color 0.2s ease-in-out;
-  flex-shrink: 0;
+  font-size: 2.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  position: relative;
+}
 
-  &:hover {
-    color: var(--app-title-hover-color); // Subtle hover effect
+.title-gradient {
+  background: linear-gradient(135deg,
+          var(--app-title-color, #2a7ce7) 0%,
+          #4f8ff7 30%,
+          #6fa3ff  70%,
+          var(--app-title-hover-color, #1a5bb7) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: subtleGradientShift 6s ease-in-out infinite;
+  display: inline-block;
+  position: relative;
+}
+
+.title-gradient::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--app-title-color, #2a7ce7), transparent);
+  border-radius: 1px;
+  opacity: 0.6;
+}
+
+.app-subtitle {
+  font-size: 1rem;
+  color: #6c757d;
+  font-weight: 400;
+  margin: 0;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeInUp 0.8s ease-out 0.3s forwards;
+}
+
+@keyframes subtleGradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-title:hover .title-gradient {
+  animation-duration: 3s;
+}
+
+@media (prefers-color-scheme: dark) {
+  .app-subtitle {
+    color: #86909c;
+  }
+  .hero-section::before {
+    background: radial-gradient(circle, rgba(42, 124, 231, 0.12) 0%, transparent 60%);
+  }
+}
+
+@media (max-width: 768px) {
+  .app-title {
+    font-size: 1.9rem;
+  }
+  .app-subtitle {
+    font-size: 0.9rem;
+  }
+  .hero-section {
+    padding: 1.5rem 0 2rem 0;
+  }
+  .title-gradient::after {
+    width: 30px;
   }
 }
 
 .main-content-area {
   flex-grow: 1;
   display: flex;
-  flex-direction: column; // Keep this to manage the Row layout
+  flex-direction: column;
 }
 
 .app-alert {
@@ -124,7 +214,7 @@ body {
   }
 }
 
-.plot-card-footer { // Assuming this is styled in PlotContainer.scss, remove/adjust if needed
+.plot-card-footer {
   min-height: 2.75rem;
   font-size: 0.85rem;
   color: #6c757d;
@@ -138,11 +228,11 @@ body {
 
 .app-footer {
   text-align: center;
-  padding: 1.5rem 0; // Increased vertical padding inside footer
-  font-size: 0.8rem; // Slightly smaller font size
-  color: var(--footer-text-color); // Use variable for lighter color
+  padding: 1.5rem 0;
+  font-size: 0.8rem;
+  color: var(--footer-text-color);
   border-top: 1px solid var(--card-border-color, #dee2e6);
   width: 100%;
   flex-shrink: 0;
-  margin-top: 3rem; // Increased margin-top for more space above footer
+  margin-top: 3rem;
 }
