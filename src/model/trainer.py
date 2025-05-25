@@ -173,9 +173,10 @@ def evaluate_model(model, test_loader, y_test_actual, last_actuals_for_test_reco
 
 def print_evaluation_results(predictions_reconstructed_actual_values, y_test_actual,
                              words_test, years_X_test, num_examples_to_show):
-    print(f"\n--- Enhanced Model Evaluation Summary (PyTorch with Advanced Momentum Features) ---")
+    print(f"\n--- Model Evaluation Summary ---")
 
-    if predictions_reconstructed_actual_values.size > 0 and y_test_actual.size == predictions_reconstructed_actual_values.size:
+    if (predictions_reconstructed_actual_values.size > 0 and
+            y_test_actual.size == predictions_reconstructed_actual_values.size):
         overall_mae_unscaled = mean_absolute_error(y_test_actual, predictions_reconstructed_actual_values)
         overall_rmse_unscaled = math.sqrt(mean_squared_error(y_test_actual, predictions_reconstructed_actual_values))
         print(f"Test MAE (on reconstructed unscaled data, overall): {overall_mae_unscaled:.8f}")
@@ -208,8 +209,13 @@ def save_model_and_assets(model, input_scalers, output_scalers, lookback_window,
     scalers_input_save_path = os.path.join(MODEL_ASSETS_DIR, SCALERS_INPUT_PICKLE_FILENAME)
     scalers_output_save_path = os.path.join(MODEL_ASSETS_DIR, SCALERS_OUTPUT_PICKLE_FILENAME)
 
-    if os.path.exists(os.path.join(MODEL_ASSETS_DIR, f"best_{PYTORCH_MODEL_FILENAME}")):
-        os.rename(os.path.join(MODEL_ASSETS_DIR, f"best_{PYTORCH_MODEL_FILENAME}"), model_save_path)
+    best_model_path = os.path.join(MODEL_ASSETS_DIR, f"best_{PYTORCH_MODEL_FILENAME}")
+
+    if os.path.exists(best_model_path):
+        # Remove existing file if it exists (Windows fix)
+        if os.path.exists(model_save_path):
+            os.remove(model_save_path)
+        os.rename(best_model_path, model_save_path)
         logging.info(f"Best PyTorch model state_dict saved as: {model_save_path}")
     else:
         torch.save(model.state_dict(), model_save_path)
@@ -242,8 +248,6 @@ def save_model_and_assets(model, input_scalers, output_scalers, lookback_window,
     with open(BACKEND_CONFIG_FILENAME, 'w') as f:
         json.dump(backend_config, f, indent=4)
     logging.info(f"Backend model config saved to: {BACKEND_CONFIG_FILENAME}")
-
-
 def train_and_evaluate_pytorch_lstm(ml_ready_data_path, lookback_param, forecast_horizon_param,
                                     train_until_year_param, hidden_size=128, num_lstm_layers=2,
                                     dropout=0.1, learning_rate=0.001, num_epochs=50,
@@ -262,9 +266,8 @@ def train_and_evaluate_pytorch_lstm(ml_ready_data_path, lookback_param, forecast
         logging.error("Training data is empty. Cannot train model.")
         return None, None, None
 
-    X_train_scaled, y_train_diff_scaled, X_test_scaled, y_test_diff_scaled, input_scalers, output_scalers = create_scalers_and_scale_data(
-        X_train, y_train_diff, X_test, y_test_diff
-    )
+    X_train_scaled, y_train_diff_scaled, X_test_scaled, y_test_diff_scaled, input_scalers, output_scalers \
+        = create_scalers_and_scale_data(X_train, y_train_diff, X_test, y_test_diff)
 
     train_loader, test_loader = create_data_loaders(
         X_train_scaled, y_train_diff_scaled, X_test_scaled, y_test_diff_scaled, batch_size
