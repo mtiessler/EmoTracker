@@ -3,9 +3,9 @@ POST http://127.0.0.1:5000/predict
 Content-Type: application/json
 
 {
-    "word": "explore",
+    "word": "gay",
     "predict_from_year": 2010,
-    "predict_until_year": 2040
+    "predict_until_year": 2050
 }
 
 ###
