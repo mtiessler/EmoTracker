@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import Icon from '@mdi/react';
 import { mdiAlertCircleOutline } from '@mdi/js';
-import { CombinedDataPoint, LoadedData, SenseInfo } from '../types';
+import { CombinedDataPoint, LoadedData, SenseInfo, PredictedVadPoint } from '../types';
 import { getVADDescription, VADDimension } from '../vadUtils';
 
 import '../styles/Plot2DVAD.scss';
@@ -21,6 +21,7 @@ interface Plot2DVADProps {
     selectedWords: string[];
     allWordsData: LoadedData | null;
     selectedSenseData?: SenseInfo | null;
+    predictedVadSeries?: PredictedVadPoint[] | null;
 }
 
 interface PayloadEntry {
@@ -31,6 +32,7 @@ interface PayloadEntry {
     payload: CombinedDataPoint;
     stroke: string;
     fill: string;
+    strokeDasharray?: string | number;
 }
 
 interface CustomTooltipProps extends TooltipProps<number | null, string> {
@@ -39,30 +41,40 @@ interface CustomTooltipProps extends TooltipProps<number | null, string> {
     label?: string | number;
 }
 
+interface ExtendedLineInfo {
+    word: string;
+    dim: VADDimension;
+    color: string;
+    dataKey: string;
+    name: string;
+    isForecast?: boolean;
+}
+
 interface MemoizedPlotData {
     chartData: CombinedDataPoint[];
     yDomain: [number | string, number | string];
-    linesToPlot: { word: string; dim: VADDimension; color: string }[];
+    linesToPlot: ExtendedLineInfo[];
     hasValidData: boolean;
-    timeDataRef: number[] | null;
+    timeDataRef: (number | string)[];
     showProportionLine: boolean;
 }
 
 const lineColors = ['#0d6efd', '#dc3545', '#198754', '#ffc107', '#6f42c1', '#fd7e14', '#20c997', '#6610f2'];
+const forecastLineStyle = { strokeDasharray: "8 4", strokeWidth: 2 };
 
-const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, selectedSenseData }) => {
+const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, selectedSenseData, predictedVadSeries }) => {
 
     const { chartData, yDomain, linesToPlot, hasValidData, timeDataRef, showProportionLine }: MemoizedPlotData = useMemo(() => {
-        const combinedChartData: { [time: number]: CombinedDataPoint } = {};
+        const workingChartDataMap = new Map<number, CombinedDataPoint>();
         const allValues: number[] = [];
-        const lines: { word: string; dim: VADDimension; color: string }[] = [];
-        let timeRef: number[] | null = null;
+        const lines: ExtendedLineInfo[] = [];
+        let commonTimeRef: number[] | null = null;
         let validDataFound = false;
         let propData: (number | null)[] | null = null;
         let showProp = false;
 
         if (!allWordsData || selectedWords.length === 0) {
-            return { chartData: [], yDomain: [0, 1] as [number | string, number | string], linesToPlot: [], hasValidData: false, timeDataRef: null, showProportionLine: false };
+            return { chartData: [], yDomain: [0, 1] as [number | string, number | string], linesToPlot: [], hasValidData: false, timeDataRef: ['auto'], showProportionLine: false };
         }
 
         const singleWord = selectedWords.length === 1 ? selectedWords[0] : null;
@@ -80,84 +92,145 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
         selectedWords.forEach((word, wordIndex) => {
             const wordData = allWordsData[word];
             if (!wordData?.temporal_vad?.x || !wordData?.temporal_vad?.v || !wordData?.temporal_vad?.a || !wordData?.temporal_vad?.d) {
-                // console.warn(`Missing VAD data for word: ${word}`);
                 return;
             }
 
             const { x, v, a, d } = wordData.temporal_vad;
 
-            if (!timeRef) {
-                timeRef = x;
-            } else if (JSON.stringify(timeRef) !== JSON.stringify(x)) {
-                // console.warn(`Time data mismatch for word: ${word}. Skipping.`);
-                return;
+            if (!commonTimeRef) {
+                commonTimeRef = [...x];
+            } else {
+                const currentWordTimesMatch = x.length === commonTimeRef.length && x.every((val, idx) => val === (commonTimeRef as number[])[idx]);
+                if (!currentWordTimesMatch && !predictedVadSeries) {
+                    console.warn(`Time data mismatch for word: ${word} and no forecast to extend. Skipping.`);
+                    return;
+                }
             }
 
             validDataFound = true;
-
             const colorBaseIndex = wordIndex % lineColors.length;
             const vColor = lineColors[(colorBaseIndex * 3) % lineColors.length];
             const aColor = lineColors[(colorBaseIndex * 3 + 1) % lineColors.length];
             const dColor = lineColors[(colorBaseIndex * 3 + 2) % lineColors.length];
 
-            lines.push({ word: word, dim: 'Valence', color: vColor });
-            lines.push({ word: word, dim: 'Arousal', color: aColor });
-            lines.push({ word: word, dim: 'Dominance', color: dColor });
+            lines.push({ word, dim: 'Valence', color: vColor, dataKey: `${word}_V`, name: `${word} V`, isForecast: false });
+            lines.push({ word, dim: 'Arousal', color: aColor, dataKey: `${word}_A`, name: `${word} A`, isForecast: false });
+            lines.push({ word, dim: 'Dominance', color: dColor, dataKey: `${word}_D`, name: `${word} D`, isForecast: false });
 
             x.forEach((time, index) => {
-                if (!combinedChartData[time]) {
-                    combinedChartData[time] = { time };
-                }
-                const vVal = typeof v[index] === 'number' && !isNaN(v[index]) ? v[index] : null;
-                const aVal = typeof a[index] === 'number' && !isNaN(a[index]) ? a[index] : null;
-                const dVal = typeof d[index] === 'number' && !isNaN(d[index]) ? d[index] : null;
+                let point = workingChartDataMap.get(time) || { time };
+                const vVal = typeof v[index] === 'number' && !isNaN(v[index] as number) ? v[index] as number : null;
+                const aVal = typeof a[index] === 'number' && !isNaN(a[index] as number) ? a[index] as number : null;
+                const dVal = typeof d[index] === 'number' && !isNaN(d[index] as number) ? d[index] as number : null;
 
-                combinedChartData[time][`${word}_V`] = vVal;
-                combinedChartData[time][`${word}_A`] = aVal;
-                combinedChartData[time][`${word}_D`] = dVal;
+                point[`${word}_V`] = vVal;
+                point[`${word}_A`] = aVal;
+                point[`${word}_D`] = dVal;
 
                 if (vVal !== null) allValues.push(vVal);
                 if (aVal !== null) allValues.push(aVal);
                 if (dVal !== null) allValues.push(dVal);
 
                 if (showProp && propData && word === singleWord) {
-                    combinedChartData[time]['proportion'] = propData[index];
+                    point['proportion'] = propData[index];
                 }
+                workingChartDataMap.set(time, point);
             });
         });
 
-        const finalChartData = Object.values(combinedChartData).sort((p1, p2) => p1.time - p2.time);
-        let finalYDomain: [number | string, number | string] = [0, 1];
+        if (predictedVadSeries && singleWord && commonTimeRef) {
+            const word = singleWord;
+            const lastActualTimeInData = Math.max(...commonTimeRef);
 
+            const actualDataForWord = allWordsData?.[word]?.temporal_vad;
+            let bridgePointCreated = false;
+
+            predictedVadSeries.forEach((pred) => {
+                let point = workingChartDataMap.get(pred.time) || { time: pred.time };
+
+                if (!bridgePointCreated && pred.time > lastActualTimeInData && actualDataForWord) {
+                    const lastActualDataIndex = actualDataForWord.x.indexOf(lastActualTimeInData);
+                    if (lastActualDataIndex !== -1) {
+                        let bridgeDataPoint = workingChartDataMap.get(lastActualTimeInData) || {time: lastActualTimeInData};
+                        bridgeDataPoint[`${word}_V_forecast`] = actualDataForWord.v[lastActualDataIndex];
+                        bridgeDataPoint[`${word}_A_forecast`] = actualDataForWord.a[lastActualDataIndex];
+                        bridgeDataPoint[`${word}_D_forecast`] = actualDataForWord.d[lastActualDataIndex];
+                        workingChartDataMap.set(lastActualTimeInData, bridgeDataPoint);
+                    }
+                    bridgePointCreated = true;
+                }
+
+                point[`${word}_V_forecast`] = pred.v;
+                point[`${word}_A_forecast`] = pred.a;
+                point[`${word}_D_forecast`] = pred.d;
+                workingChartDataMap.set(pred.time, point);
+
+                if (pred.v !== null) allValues.push(pred.v);
+                if (pred.a !== null) allValues.push(pred.a);
+                if (pred.d !== null) allValues.push(pred.d);
+                if (!commonTimeRef.includes(pred.time)) {
+                    commonTimeRef.push(pred.time);
+                }
+            });
+
+            commonTimeRef.sort((a,b) => a-b);
+
+            const colorBaseIndex = selectedWords.indexOf(word) % lineColors.length;
+            lines.push({
+                word, dim: 'Valence', color: lineColors[(colorBaseIndex * 3) % lineColors.length],
+                dataKey: `${word}_V_forecast`, name: `${word} V (Forecast)`, isForecast: true
+            });
+            lines.push({
+                word, dim: 'Arousal', color: lineColors[(colorBaseIndex * 3 + 1) % lineColors.length],
+                dataKey: `${word}_A_forecast`, name: `${word} A (Forecast)`, isForecast: true
+            });
+            lines.push({
+                word, dim: 'Dominance', color: lineColors[(colorBaseIndex * 3 + 2) % lineColors.length],
+                dataKey: `${word}_D_forecast`, name: `${word} D (Forecast)`, isForecast: true
+            });
+        }
+
+        const finalChartData = Array.from(workingChartDataMap.values()).sort((p1, p2) => p1.time - p2.time);
+
+        let finalYDomain: [number | string, number | string] = [0, 1];
         if (allValues.length > 0) {
             const minValue = Math.min(...allValues);
             const maxValue = Math.max(...allValues);
             const range = maxValue - minValue;
             const padding = range < 0.01 ? 0.05 : range * 0.05;
-            const calculatedMin = minValue - padding;
-            const calculatedMax = maxValue + padding;
+            let calculatedMin = minValue - padding;
+            let calculatedMax = maxValue + padding;
 
-            if (calculatedMin < calculatedMax) {
-                if (calculatedMin < 0 || calculatedMax > 1) {
-                    finalYDomain = [calculatedMin, calculatedMax];
-                } else {
-                    finalYDomain = [Math.max(0, calculatedMin), Math.min(1, calculatedMax)];
-                }
-            } else if (allValues.length === 1) {
-                finalYDomain = [allValues[0] - padding, allValues[0] + padding];
-                finalYDomain = [Math.max(0, finalYDomain[0]), Math.min(1, finalYDomain[1])];
-                if(finalYDomain[0] >= finalYDomain[1]) {
-                    finalYDomain = [finalYDomain[0] - 0.05, finalYDomain[1] + 0.05];
-                }
+            if (calculatedMax - calculatedMin < 0.1) {
+                const mid = (calculatedMin + calculatedMax) / 2;
+                calculatedMin = mid - 0.05;
+                calculatedMax = mid + 0.05;
             }
+
+            finalYDomain = [
+                Math.min(calculatedMin, 0),
+                Math.max(calculatedMax, 1)
+            ];
             if (finalYDomain[0] >= finalYDomain[1]) {
-                finalYDomain = [0, 1];
+                const center = (finalYDomain[0] + finalYDomain[1]) / 2 || 0.5;
+                finalYDomain = [center - 0.1, center + 0.1];
             }
+            finalYDomain = [Math.max(finalYDomain[0], -1), Math.min(finalYDomain[1], 1.5)];
+            if (finalYDomain[0] >= finalYDomain[1]) finalYDomain = [0,1];
+
+
         }
 
-        return { chartData: finalChartData, yDomain: finalYDomain, linesToPlot: lines, hasValidData: validDataFound, timeDataRef: timeRef, showProportionLine: showProp };
+        return {
+            chartData: finalChartData,
+            yDomain: finalYDomain,
+            linesToPlot: lines,
+            hasValidData: validDataFound,
+            timeDataRef: commonTimeRef || ['auto'],
+            showProportionLine: showProp
+        };
 
-    }, [selectedWords, allWordsData, selectedSenseData]);
+    }, [selectedWords, allWordsData, selectedSenseData, predictedVadSeries]);
 
 
     if (selectedWords.length === 0) {
@@ -194,7 +267,9 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
                                 </p>
                             );
                         } else {
-                            const keyParts = entry.dataKey.split('_');
+                            const isForecast = entry.dataKey?.endsWith('_forecast');
+                            const baseKey = isForecast ? entry.dataKey.slice(0, -9) : entry.dataKey;
+                            const keyParts = baseKey.split('_');
                             if (keyParts.length < 2) return null;
 
                             const word = keyParts[0];
@@ -202,9 +277,11 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
                             const dimension = dimLetter === 'V' ? 'Valence' : dimLetter === 'A' ? 'Arousal' : 'Dominance';
                             const value = entry.value;
                             const description = getVADDescription(dimension as VADDimension, value);
+                            const nameSuffix = isForecast ? ' (Forecast)' : '';
+
                             return (
-                                <p key={index} className="desc" style={{ color: entry.color }}>
-                                    {`${word} ${dimension}: ${value?.toFixed(3) ?? 'N/A'}`}
+                                <p key={index} className="desc" style={{ color: entry.color, fontStyle: isForecast ? 'italic' : 'normal' }}>
+                                    {`${word} ${dimension}${nameSuffix}: ${value?.toFixed(3) ?? 'N/A'}`}
                                     {description && <span className="qualitative">({description})</span>}
                                 </p>
                             );
@@ -227,19 +304,20 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
                         type="number"
                         domain={['dataMin', 'dataMax']}
                         allowDuplicatedCategory={false}
-                        tickCount={Math.min(10, timeDataRef?.length ?? 10)}
                         label={{ value: "Year", position: "insideBottom", dy: 15 }}
                         height={50}
                         scale="time"
                         interval="preserveStartEnd"
                         tickLine={false}
+                        ticks={Array.isArray(timeDataRef) && timeDataRef.length > 1 && typeof timeDataRef[0] === 'number' ? timeDataRef as number[] : undefined}
                     />
                     <YAxis
                         yAxisId="left"
                         domain={yDomain}
                         label={{ value: 'VAD Value', angle: -90, position: 'insideLeft', dx: -5 }}
                         width={65}
-                        tickFormatter={(tick) => typeof tick === 'number' ? tick.toFixed(2) : tick}
+                        tickFormatter={(tick) => typeof tick === 'number' ? tick.toFixed(2) : String(tick)}
+                        allowDataOverflow={true}
                         tickLine={false}
                     />
                     {showProportionLine && (
@@ -249,7 +327,7 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
                             domain={[0, 1]}
                             label={{ value: 'Sense Prop.', angle: 90, position: 'insideRight', dx: 5 }}
                             width={65}
-                            tickFormatter={(tick) => typeof tick === 'number' ? tick.toFixed(2) : tick}
+                            tickFormatter={(tick) => typeof tick === 'number' ? tick.toFixed(2) : String(tick)}
                             tickLine={false}
                         />
                     )}
@@ -262,14 +340,15 @@ const Plot2DVAD: React.FC<Plot2DVADProps> = ({ selectedWords, allWordsData, sele
                     {linesToPlot.map(lineInfo => (
                         <Line
                             yAxisId="left"
-                            key={`${lineInfo.word}_${lineInfo.dim}`}
+                            key={lineInfo.dataKey}
                             type="monotone"
-                            dataKey={`${lineInfo.word}_${lineInfo.dim.charAt(0)}`}
-                            name={`${lineInfo.word} ${lineInfo.dim.charAt(0)}`}
+                            dataKey={lineInfo.dataKey}
+                            name={lineInfo.name}
                             stroke={lineInfo.color}
-                            strokeWidth={1.5}
+                            strokeWidth={lineInfo.isForecast ? forecastLineStyle.strokeWidth : 1.5}
+                            strokeDasharray={lineInfo.isForecast ? forecastLineStyle.strokeDasharray : undefined}
                             activeDot={{ r: 4, strokeWidth: 0, fill: lineInfo.color }}
-                            dot={false}
+                            dot={lineInfo.isForecast ? { r: 3, fill: lineInfo.color, strokeWidth:0 } : false}
                             connectNulls={false}
                         />
                     ))}
