@@ -1,4 +1,8 @@
 # EmoTracker
+
+> "The emotions are often the masters of reason."  
+> — *Sigmund Freud, paraphrasing from* **The Ego and the Id** *(1923)*
+
 EmoTracker is a framework for modeling how emotional associations of words (represented by Valence, Arousal, and Dominance (VAD)) evolve over time. 
 
 Unlike traditional emotion lexicons that treat word affect as static, EmoTracker combines **sense-aware temporal embeddings** with the **NRC-VAD lexicon** to infer diachronic emotional trajectories for English words.
