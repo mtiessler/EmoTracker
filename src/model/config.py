@@ -1,0 +1,23 @@
+import os
+
+PYTORCH_MODEL_FILENAME = 'lstm_vad_model_pytorch.pth'
+SCALERS_INPUT_PICKLE_FILENAME = 'vad_scalers_input_pytorch.pkl'
+SCALERS_OUTPUT_PICKLE_FILENAME = 'vad_scalers_output_pytorch.pkl'
+MODEL_ASSETS_DIR = os.path.join('', '..', 'data', 'model_assets_pytorch')
+BACKEND_CONFIG_FILENAME = os.path.join(MODEL_ASSETS_DIR, 'backend_model_config_pytorch.json')
+TIME_STEP_YEARS = 5
+ML_READY_OUTPUT_FILENAME_FOR_GENERATION = 'ml_ready_temporal_vad_data.json'
+
+LOOKBACK_PARAM = 15
+FORECAST_HORIZON_PARAM = 1
+TRAIN_UNTIL_YEAR_PARAM = 1980
+NUM_EPOCHS = 1
+NUM_EXAMPLES_TO_SHOW = 5
+HIDDEN_SIZE_PARAM = 128
+NUM_LSTM_LAYERS_PARAM = 2
+DROPOUT_PARAM = 0.2
+LEARNING_RATE_PARAM = 0.0005
+
+NUM_BASE_FEATURES = 3
+NUM_MOMENTUM_FEATURES_PER_DIM = 8
+BATCH_SIZE = 64
