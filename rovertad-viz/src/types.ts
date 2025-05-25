@@ -1,26 +1,31 @@
-// src/types.ts
-
 export interface TemporalVAD {
-  x: number[]; // Years/Time steps
-  v: number[]; // Valence
-  a: number[]; // Arousal
-  d: number[]; // Dominance
+  x: number[];
+  v: (number | null)[];
+  a: (number | null)[];
+  d: (number | null)[];
 }
 
 export interface SenseInfo {
+  sense_id: string;
   definition: string;
   vad: [number, number, number];
-  y_fitting?: number[];
+  y?: (number | null)[];
+  y_fitting?: (number | null)[];
 }
 
 export interface WordSenses {
-  [senseId: string]: SenseInfo;
+  [senseId: string]: {
+    definition: string;
+    vad: [number, number, number];
+    y?: (number | null)[];
+    y_fitting?: (number | null)[];
+  };
 }
 
 export interface SpectrogramData {
   years: number[];
   sense_ids: string[];
-  proportions_matrix: number[][]; // [sense][year]
+  proportions_matrix: (number | null)[][];
 }
 
 export interface WordData {
@@ -33,7 +38,7 @@ export interface LoadedData {
   [word: string]: WordData;
 }
 
-export type VizType = '2D-V' | '2D-A' | '2D-D' | '2D-VAD' | '3D' | '4D';
+export type VizType = '2D-V' | '2D-A' | '2D-D' | '2D-VAD' | '3D' | '4D' | 'LSTM-Forecast';
 
 export interface CombinedDataPoint {
   time: number;
@@ -43,4 +48,11 @@ export interface CombinedDataPoint {
 export interface OptionType {
   value: string;
   label: string;
+}
+
+export interface PredictedVadPoint {
+  time: number;
+  v: number;
+  a: number;
+  d: number;
 }
