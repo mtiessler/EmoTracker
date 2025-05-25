@@ -25,8 +25,8 @@ def main():
 
     if not os.path.exists(ml_ready_data_file):
         logging.error(f"Data file not found: {ml_ready_data_file}")
-        logging.error(
-            "Please run the data generation script (the one that produced ml_ready_temporal_vad_data.json) first.")
+        logging.error("Please run the data generation script "
+            "(the one that produced ml_ready_temporal_vad_data.json) first.")
         return
 
     trained_model, _, _ = train_and_evaluate_pytorch_lstm(
@@ -44,9 +44,9 @@ def main():
     )
 
     if trained_model:
-        print("Enhanced PyTorch LSTM with Advanced Momentum Features - Training and asset saving complete.")
+        print("LSTM Training and asset saving complete.")
     else:
-        print("Enhanced PyTorch LSTM with Advanced Momentum Features - Training failed.")
+        print("LSTM Training failed.")
 
 
 if __name__ == "__main__":
