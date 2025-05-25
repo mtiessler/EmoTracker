@@ -46,7 +46,7 @@ def convert_pickle_to_json(pickle_path, json_path):
         except OSError as e:
             print(f"Error: Could not create output directory '{output_dir}'. Check permissions.", file=sys.stderr)
             print(f"Details: {e}", file=sys.stderr)
-            return # Stop if cannot create directory
+            return
 
     try:
         with open(json_path, 'w', encoding='utf-8') as outfile:
