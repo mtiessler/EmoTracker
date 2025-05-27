@@ -9,6 +9,35 @@ Unlike traditional emotion lexicons that treat word affect as static, EmoTracker
 
 It also uses a **LSTM architecture** with **advanced momentum-based feature engineering** and **multi-head attention mechanisms** to predict diachronic emotional trajectories for English words.
 
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Motivation](#motivation)
+- [Dataset Construction](#dataset-construction)
+- [LSTM Architecture](#lstm-architecture)
+  - [Advanced Momentum Feature Engineering](#advanced-momentum-feature-engineering)
+  - [Neural Architecture Components](#neural-architecture-components)
+  - [Architecture Overview](#architecture-overview)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [1. Install Dependencies](#1-install-dependencies)
+  - [2. Generate Temporal VAD Dataset](#2-generate-temporal-vad-dataset)
+  - [3. Train LSTM Model](#3-train-lstm-model)
+  - [4. Launch Prediction API](#4-launch-prediction-api)
+  - [5. Start Visualization Dashboard](#5-start-visualization-dashboard)
+- [API Usage](#api-usage)
+  - [Predict VAD Trajectory](#predict-vad-trajectory)
+- [Visualization Dashboard Features](#visualization-dashboard-features)
+  - [Dashboard Screenshots](#dashboard-screenshots)
+- [Model Performance](#model-performance)
+  - [Training Configuration](#training-configuration)
+  - [Training Results](#training-results)
+  - [Evaluation Metrics (Test Set)](#evaluation-metrics-test-set)
+  - [Model Accuracy Examples](#model-accuracy-examples)
+- [Innovations](#innovations)
+- [Research Applications](#research-applications)
+- [References](#references)
+
 ---
 
 ## Key Features
