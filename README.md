@@ -37,6 +37,35 @@ Where momentum features include
 
 ---
 
+## Dataset Construction
+
+We generate VAD trajectories for 2,000+ frequent English words across decades (1850–2000) using:
+
+1. **Temporal Sense Clusters**
+   From Hu et al. (2019), each word `w` has sense embeddings `e_{w, t}^{(s)}` for each sense `s` over time `t`.
+
+2. **Mapping Senses to VAD**
+   For each sense embedding, we compute an approximate VAD score by retrieving k-nearest neighbors from a VAD-annotated embedding space:
+
+```
+VAD(w, t, s) = (1/k) * sum_i VAD(n_i)
+```
+
+Where `n_i` are the k nearest neighbors from the NRC-VAD space.
+
+3. **Weighted Averaging Across Senses**
+   Using sense probabilities `p(s_t)` from Hu et al., we compute a weighted average:
+
+```
+VAD(w, t) = sum_s p(s_t) * VAD(w, t, s)
+```
+**\[State of the art datasets]**
+
+**![Data Timeline](data/imgs/data_timeline.png)**
+
+
+---
+
 ## LSTM Architecture
 
 ### Advanced Momentum Feature Engineering
