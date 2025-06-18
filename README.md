@@ -9,6 +9,35 @@ Unlike traditional emotion lexicons that treat word affect as static, EmoTracker
 
 It also uses a **LSTM architecture** with **advanced momentum-based feature engineering** and **multi-head attention mechanisms** to predict diachronic emotional trajectories for English words.
 
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Motivation](#motivation)
+- [Dataset Construction](#dataset-construction)
+- [LSTM Architecture](#lstm-architecture)
+  - [Advanced Momentum Feature Engineering](#advanced-momentum-feature-engineering)
+  - [Neural Architecture Components](#neural-architecture-components)
+  - [Architecture Overview](#architecture-overview)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [1. Install Dependencies](#1-install-dependencies)
+  - [2. Generate Temporal VAD Dataset](#2-generate-temporal-vad-dataset)
+  - [3. Train LSTM Model](#3-train-lstm-model)
+  - [4. Launch Prediction API](#4-launch-prediction-api)
+  - [5. Start Visualization Dashboard](#5-start-visualization-dashboard)
+- [API Usage](#api-usage)
+  - [Predict VAD Trajectory](#predict-vad-trajectory)
+- [Visualization Dashboard Features](#visualization-dashboard-features)
+  - [Dashboard Screenshots](#dashboard-screenshots)
+- [Model Performance](#model-performance)
+  - [Training Configuration](#training-configuration)
+  - [Training Results](#training-results)
+  - [Evaluation Metrics (Test Set)](#evaluation-metrics-test-set)
+  - [Model Accuracy Examples](#model-accuracy-examples)
+- [Innovations](#innovations)
+- [Research Applications](#research-applications)
+- [References](#references)
+
 ---
 
 ## Key Features
@@ -34,6 +63,35 @@ Where momentum features include
 - trend strength 
 - volatility
 - temporal oscillators.
+
+---
+
+## Dataset Construction
+
+We generate VAD trajectories for 2,000+ frequent English words across decades (1850–2000) using:
+
+1. **Temporal Sense Clusters**
+   From Hu et al. (2019), each word `w` has sense embeddings `e_{w, t}^{(s)}` for each sense `s` over time `t`.
+
+2. **Mapping Senses to VAD**
+   For each sense embedding, we compute an approximate VAD score by retrieving k-nearest neighbors from a VAD-annotated embedding space:
+
+```
+VAD(w, t, s) = (1/k) * sum_i VAD(n_i)
+```
+
+Where `n_i` are the k nearest neighbors from the NRC-VAD space.
+
+3. **Weighted Averaging Across Senses**
+   Using sense probabilities `p(s_t)` from Hu et al., we compute a weighted average:
+
+```
+VAD(w, t) = sum_s p(s_t) * VAD(w, t, s)
+```
+**\[State of the art datasets]**
+
+**![Data Timeline](data/imgs/data_timeline.png)**
+
 
 ---
 
