@@ -319,15 +319,10 @@ def find_file(filename, search_dirs):
 
 def main():
     print("EmoTracker Gold Standard Evaluation")
-    print("=" * 40)
 
     # Find files
-    gold_file = find_file("goldEN.vad", [".", "..", "../..", "../../data", "../data"])
-    ml_file = find_file("ml_ready_temporal_vad_data.json", [
-        "../../data/Generated_VAD_Dataset",
-        "../data/Generated_VAD_Dataset",
-        "data/Generated_VAD_Dataset"
-    ])
+    gold_file = find_file("goldEN.vad", ["../../data/VAD_Lexicons/Golden_VAD", "../data"])
+    ml_file = find_file("ml_ready_temporal_vad_data.json", ["../../data/Generated_VAD_Dataset"])
 
     if not gold_file:
         print("ERROR: Cannot find goldEN.vad file")
@@ -351,17 +346,19 @@ def main():
 
         if results:
             print_summary_statistics(results)
-            save_detailed_results(results, 'gold_standard_evaluation_detailed.json')
+            save_detailed_results(results, os.path.join("..",
+                                                        "..",
+                                                        "data",
+                                                        "model_assets_pytorch",
+                                                        'gold_standard_evaluation_detailed.json'))
 
             print(f"\nEvaluation completed successfully.")
 
         else:
-            print("EVALUATION FAILED - Check data files and try again")
+            print("Check data files and try again")
 
     except Exception as e:
         print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
 
 
 if __name__ == "__main__":
