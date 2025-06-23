@@ -3,6 +3,12 @@
   font-size: 0.82rem; // Slightly larger base font
   line-height: 1.45; // Slightly increased line height
 
+  // Add white background and styling
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
   .label {
     font-weight: 600;
     margin-bottom: 0.5rem; // More space below label
