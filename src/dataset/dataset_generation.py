@@ -24,6 +24,7 @@ DEFAULT_VAD = [0.5, 0.5, 0.5]
 START_YEAR_UNIFIED = 1820
 END_YEAR_UNIFIED = 2010
 TIME_STEP_UNIFIED = 5
+MAX_NULL_VALUES_PER_DIMENSION = 15
 
 
 def get_paths():
@@ -150,7 +151,7 @@ def generate_initial_dataset(sense_data_path, vad_lexicon):
         years_list_for_word, num_time_steps = None, 0
         for sense_info_outer in senses.values():
             if isinstance(sense_info_outer, dict) and 'x' in sense_info_outer and isinstance(sense_info_outer['x'],
-                                                                                 list) and sense_info_outer[
+                                                                                             list) and sense_info_outer[
                 'x']:
                 years_list_for_word = [int(y) for y in sense_info_outer['x']]
                 num_time_steps = len(years_list_for_word)
@@ -250,6 +251,43 @@ def _unify_series_to_timeline(x_series, y_series, global_unified_timeline, nan_v
             val = series_map[target_year_float]
         unified_y_list.append(val)
     return unified_y_list
+
+
+def filter_words_with_too_many_nulls(ml_ready_dataset, max_nulls_per_dim=MAX_NULL_VALUES_PER_DIMENSION):
+    filtered_dataset = {}
+    words_removed = []
+
+    for word, word_data in ml_ready_dataset.items():
+        if 'temporal_vad' not in word_data:
+            continue
+
+        temporal_vad = word_data['temporal_vad']
+        v_values = temporal_vad.get('v', [])
+        a_values = temporal_vad.get('a', [])
+        d_values = temporal_vad.get('d', [])
+
+        # Count null values in each dimension (checking for both None and np.nan)
+        v_nulls = sum(1 for val in v_values if val is None or (isinstance(val, (float, np.floating)) and np.isnan(val)))
+        a_nulls = sum(1 for val in a_values if val is None or (isinstance(val, (float, np.floating)) and np.isnan(val)))
+        d_nulls = sum(1 for val in d_values if val is None or (isinstance(val, (float, np.floating)) and np.isnan(val)))
+
+        # Check if any dimension has too many nulls
+        if (v_nulls > max_nulls_per_dim or
+                a_nulls > max_nulls_per_dim or
+                d_nulls > max_nulls_per_dim):
+            words_removed.append(word)
+            logging.info(f"Removing word '{word}' - null counts: V={v_nulls}, A={a_nulls}, D={d_nulls}")
+        else:
+            filtered_dataset[word] = word_data
+
+    logging.info(
+        f"Filtered out {len(words_removed)} words with too many null values (>{max_nulls_per_dim} per dimension)")
+    logging.info(f"Remaining words in dataset: {len(filtered_dataset)}")
+
+    if len(words_removed) > 0:
+        logging.info(f"Sample of removed words: {words_removed[:10]}")
+
+    return filtered_dataset
 
 
 def augment_and_unify_ml_data(initial_dataset_param, start_year, end_year, time_step):
@@ -388,8 +426,11 @@ def main():
         logging.error("Failed to generate ML-ready data. Exiting.")
         return
 
-    ml_data_fixed_for_json = replace_nan_with_none(ml_data)
+    # Filter out words with too many null values
+    logging.info("Filtering words with too many null values...")
+    ml_data_filtered = filter_words_with_too_many_nulls(ml_data, MAX_NULL_VALUES_PER_DIMENSION)
 
+    ml_data_fixed_for_json = replace_nan_with_none(ml_data_filtered)
 
     logging.info(f"Saving ML-ready dataset to: {ml_ready_out_p}")
     try:
@@ -401,18 +442,18 @@ def main():
     except Exception as e:
         logging.error(f"Error saving ML-ready dataset: {e}")
 
-    if 'explore' in ml_data and 'temporal_vad' in ml_data['explore']:
+    if 'explore' in ml_data_filtered and 'temporal_vad' in ml_data_filtered['explore']:
         print("\nSample data for 'explore' in ML-ready dataset (Python internal representation):")
-        explore_tv = ml_data['explore']['temporal_vad']
+        explore_tv = ml_data_filtered['explore']['temporal_vad']
         if 'x' in explore_tv:
             explore_x = explore_tv['x']
             print(f"Word 'explore' temporal_vad.x (sample): {explore_x[:6]}... (Total: {len(explore_x)})")
         if 'v' in explore_tv:
             print(
                 f"Word 'explore' temporal_vad.v (sample): {[x if not np.isnan(x) else 'NaN' for x in explore_tv['v'][:3]]}... (Total: {len(explore_tv['v'])})")
-        if 'senses' in ml_data['explore'] and ml_data['explore']['senses']:
-            first_sense_id = list(ml_data['explore']['senses'].keys())[0]
-            first_sense_data = ml_data['explore']['senses'][first_sense_id]
+        if 'senses' in ml_data_filtered['explore'] and ml_data_filtered['explore']['senses']:
+            first_sense_id = list(ml_data_filtered['explore']['senses'].keys())[0]
+            first_sense_data = ml_data_filtered['explore']['senses'][first_sense_id]
             y_sample = first_sense_data.get('y', [])
             print(
                 f"Word 'explore' first sense ('{first_sense_id}') y (sample): {[x if not np.isnan(x) else 'NaN' for x in y_sample[:3]]}... (Total: {len(y_sample)})")
