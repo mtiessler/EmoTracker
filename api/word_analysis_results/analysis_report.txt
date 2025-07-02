@@ -1,0 +1,54 @@
+WORD PERFORMANCE ANALYSIS REPORT
+========================================
+
+Total words analyzed: 3220
+
+OVERALL PERFORMANCE:
+Mean MAE: 0.0206
+Median MAE: 0.0083
+Std MAE: 0.0617
+Range: 0.0000 - 0.9994
+
+DIMENSION-SPECIFIC PERFORMANCE:
+Valence:
+  Mean MAE: 0.0204
+  Median MAE: 0.0076
+  Std MAE: 0.0614
+
+Arousal:
+  Mean MAE: 0.0217
+  Median MAE: 0.0068
+  Std MAE: 0.0782
+
+Dominance:
+  Mean MAE: 0.0196
+  Median MAE: 0.0070
+  Std MAE: 0.0614
+
+TOP 10 BEST PERFORMING WORDS:
+ 1. education       (MAE: 0.0000)
+ 2. ta              (MAE: 0.0000)
+ 3. salary          (MAE: 0.0000)
+ 4. someone         (MAE: 0.0000)
+ 5. attempt         (MAE: 0.0000)
+ 6. jail            (MAE: 0.0000)
+ 7. religious       (MAE: 0.0000)
+ 8. lovely          (MAE: 0.0000)
+ 9. valley          (MAE: 0.0000)
+10. factory         (MAE: 0.0000)
+
+TOP 10 WORST PERFORMING WORDS:
+ 1. shattered       (MAE: 0.9994)
+ 2. notwithstanding (MAE: 0.8112)
+ 3. crushed         (MAE: 0.7025)
+ 4. facing          (MAE: 0.6799)
+ 5. abandoned       (MAE: 0.6718)
+ 6. cracked         (MAE: 0.6717)
+ 7. failing         (MAE: 0.6607)
+ 8. boiling         (MAE: 0.6224)
+ 9. framed          (MAE: 0.6156)
+10. floating        (MAE: 0.5940)
+
+Word length correlation with MAE: 0.089
+Trajectory length correlation with MAE: nan
+VAD variance correlation with MAE: 0.051
