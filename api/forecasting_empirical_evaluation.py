@@ -468,7 +468,7 @@ def create_summary_table(df, output_dir):
     logger.info(f"Saved summary to {summary_path}")
 
 
-def analyze_word_performance(output_dir="word_analysis_results"):
+def analyze_word_performance(output_dir="forecasting_evaluation_results"):
     if not config.resources_loaded_pytorch:
         logger.error("PyTorch resources not loaded - cannot proceed with analysis")
         return False
@@ -696,7 +696,7 @@ def create_individual_visualizations(df, output_dir):
     logger.debug(f"Saved worst RMSE performers to {output_path}")
 
 
-def enhanced_analyze_word_performance(output_dir="word_analysis_results"):
+def enhanced_analyze_word_performance(output_dir="forecasting_evaluation_results"):
     logger.info("Starting enhanced word performance analysis")
 
     if analyze_word_performance(output_dir):
@@ -729,7 +729,7 @@ def main():
     logger.info("Starting EmoTracker word performance analysis")
 
     if enhanced_analyze_word_performance():
-        logger.info("Analysis completed successfully - check 'word_analysis_results' directory")
+        logger.info("Analysis completed successfully - check 'forecasting_evaluation_results' directory")
     else:
         logger.error("Analysis failed - check error messages and log file")
 
