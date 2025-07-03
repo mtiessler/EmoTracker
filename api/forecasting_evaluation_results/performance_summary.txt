@@ -1,0 +1,103 @@
+EMOTRACKER TIME SERIES PREDICTION PERFORMANCE SUMMARY
+============================================================
+
+Total words analyzed: 2,935
+Prediction task: 1980 -> 2010 (30-year forecasting)
+
+OVERALL PERFORMANCE DISTRIBUTION:
+----------------------------------------
+MAE STATISTICS:
+  10th percentile: 0.001256
+  25th percentile: 0.003654
+  50th percentile: 0.008099
+  75th percentile: 0.016742
+  90th percentile: 0.031220
+  95th percentile: 0.043006
+  99th percentile: 0.073359
+Mean: 0.013308
+Std:  0.016637
+
+RMSE STATISTICS:
+  10th percentile: 0.001410
+  25th percentile: 0.004288
+  50th percentile: 0.009266
+  75th percentile: 0.019035
+  90th percentile: 0.035053
+  95th percentile: 0.047493
+  99th percentile: 0.082864
+Mean: 0.015026
+Std:  0.018368
+
+PERFORMANCE CATEGORIES:
+----------------------------------------
+MAE Categories:
+Excellent (MAE <= 0.01):      1692 words (57.6%)
+Good (0.01 < MAE <= 0.05):    1141 words (38.9%)
+Fair (0.05 < MAE <= 0.10):      89 words (3.0%)
+Poor (MAE > 0.10):              13 words (0.4%)
+
+RMSE Categories:
+Excellent (RMSE <= 0.015):    1962 words (66.8%)
+Good (0.015 < RMSE <= 0.075):   928 words (31.6%)
+Fair (0.075 < RMSE <= 0.15):     39 words (1.3%)
+Poor (RMSE > 0.15):              6 words (0.2%)
+
+DIMENSION-SPECIFIC PERFORMANCE:
+----------------------------------------------------------------------
+Dimension  Correlation  R-squared  Mean MAE   Mean RMSE  Med MAE    Med RMSE  
+----------------------------------------------------------------------
+Valence    0.9913       0.9827     0.014567   0.014567   0.007317   0.007317  
+Arousal    0.9932       0.9864     0.012620   0.012620   0.006662   0.006662  
+Dominance  0.9930       0.9861     0.012736   0.012736   0.006802   0.006802  
+
+TOP 10 BEST PERFORMERS (MAE):
+----------------------------------------
+ 1. federal         MAE: 0.000029 RMSE: 0.000032
+ 2. exceptional     MAE: 0.000050 RMSE: 0.000059
+ 3. factory         MAE: 0.000053 RMSE: 0.000059
+ 4. yesterday       MAE: 0.000056 RMSE: 0.000058
+ 5. eighteenth      MAE: 0.000056 RMSE: 0.000067
+ 6. declaration     MAE: 0.000064 RMSE: 0.000080
+ 7. tiny            MAE: 0.000067 RMSE: 0.000069
+ 8. elsewhere       MAE: 0.000068 RMSE: 0.000090
+ 9. cottage         MAE: 0.000072 RMSE: 0.000098
+10. anger           MAE: 0.000072 RMSE: 0.000102
+
+TOP 10 BEST PERFORMERS (RMSE):
+----------------------------------------
+ 1. federal         MAE: 0.000029 RMSE: 0.000032
+ 2. yesterday       MAE: 0.000056 RMSE: 0.000058
+ 3. exceptional     MAE: 0.000050 RMSE: 0.000059
+ 4. factory         MAE: 0.000053 RMSE: 0.000059
+ 5. eighteenth      MAE: 0.000056 RMSE: 0.000067
+ 6. tiny            MAE: 0.000067 RMSE: 0.000069
+ 7. declaration     MAE: 0.000064 RMSE: 0.000080
+ 8. elsewhere       MAE: 0.000068 RMSE: 0.000090
+ 9. us              MAE: 0.000082 RMSE: 0.000090
+10. anywhere        MAE: 0.000075 RMSE: 0.000093
+
+TOP 10 WORST PERFORMERS (MAE):
+----------------------------------------
+ 1. peaceful        MAE: 0.263699 RMSE: 0.276338
+ 2. gay             MAE: 0.175624 RMSE: 0.214476
+ 3. bacon           MAE: 0.165044 RMSE: 0.168681
+ 4. depression      MAE: 0.163483 RMSE: 0.167737
+ 5. vanity          MAE: 0.160501 RMSE: 0.179472
+ 6. cabinet         MAE: 0.145005 RMSE: 0.174228
+ 7. contention      MAE: 0.129046 RMSE: 0.134869
+ 8. stress          MAE: 0.123538 RMSE: 0.128713
+ 9. mad             MAE: 0.114773 RMSE: 0.130269
+10. wicked          MAE: 0.112882 RMSE: 0.133310
+
+TOP 10 WORST PERFORMERS (RMSE):
+----------------------------------------
+ 1. peaceful        MAE: 0.263699 RMSE: 0.276338
+ 2. gay             MAE: 0.175624 RMSE: 0.214476
+ 3. vanity          MAE: 0.160501 RMSE: 0.179472
+ 4. cabinet         MAE: 0.145005 RMSE: 0.174228
+ 5. bacon           MAE: 0.165044 RMSE: 0.168681
+ 6. depression      MAE: 0.163483 RMSE: 0.167737
+ 7. contention      MAE: 0.129046 RMSE: 0.134869
+ 8. wicked          MAE: 0.112882 RMSE: 0.133310
+ 9. mad             MAE: 0.114773 RMSE: 0.130269
+10. stress          MAE: 0.123538 RMSE: 0.128713
