@@ -1,3 +1,0 @@
-ERROR LOG - Words that failed prediction
-==================================================
-
