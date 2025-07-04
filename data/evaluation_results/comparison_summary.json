@@ -1,0 +1,26 @@
+{
+  "nrc": {
+    "n_words": 78,
+    "overall_correlation": 0.28729871587505784,
+    "valence_correlation": 0.38857122363509533,
+    "arousal_correlation": 0.33885730528568075,
+    "dominance_correlation": 0.09421957043678776,
+    "overall_p_value": 7.977039331449903e-06
+  },
+  "warriner": {
+    "n_words": 78,
+    "overall_correlation": 0.274026469297455,
+    "valence_correlation": 0.24932709464356273,
+    "arousal_correlation": 0.2921631801345621,
+    "dominance_correlation": 0.2803809924171388,
+    "overall_p_value": 2.128132608397118e-05
+  },
+  "memolon": {
+    "n_words": 78,
+    "overall_correlation": 0.17891523668689766,
+    "valence_correlation": 0.22435387291926998,
+    "arousal_correlation": 0.1723101616757928,
+    "dominance_correlation": 0.15589119580078034,
+    "overall_p_value": 0.0060621653607062
+  }
+}
