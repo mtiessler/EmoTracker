@@ -78,7 +78,7 @@ def adjust_hidden_size_for_attention(hidden_size):
 def train_model(model, train_loader, test_loader, num_epochs, learning_rate, device):
     criterion = nn.MSELoss()
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-5)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
 
     best_val_loss = float('inf')
     patience_counter = 0
