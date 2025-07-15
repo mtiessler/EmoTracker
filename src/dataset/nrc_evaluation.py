@@ -322,14 +322,14 @@ def main():
 
     # Find files
     gold_file = find_file("goldEN.vad", ["../../data/VAD_Lexicons/Golden_VAD", "../data"])
-    ml_file = find_file("ml_ready_temporal_vad_data.json", ["../../data/Generated_VAD_Dataset"])
+    ml_file = find_file("emotracker_nrc.json", ["../../data/Generated_VAD_Dataset"])
 
     if not gold_file:
         print("ERROR: Cannot find goldEN.vad file")
         return
 
     if not ml_file:
-        print("ERROR: Cannot find ml_ready_temporal_vad_data.json file")
+        print("ERROR: Cannot find emotracker_nrc.json file")
         return
 
     print(f"Data sources:")

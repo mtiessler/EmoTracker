@@ -375,7 +375,7 @@ def find_files():
 
     for dataset_name in ['nrc', 'warriner', 'memolon']:
         dataset_path = os.path.join(dataset_base_dir, f"dataset_{dataset_name}",
-                                    f"ml_ready_temporal_vad_data_{dataset_name}.json")
+                                    f"emotracker_{dataset_name}.json")
         if os.path.exists(dataset_path):
             dataset_files[dataset_name] = dataset_path
 

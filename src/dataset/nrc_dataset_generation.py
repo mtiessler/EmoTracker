@@ -17,7 +17,7 @@ RELATIVE_OUTPUT_DIR_COMPONENTS = ['..', '..', 'data', 'Generated_VAD_Dataset']
 SENSE_DATA_FILENAME = 'prob_fitting_10.data'
 VAD_LEXICON_FILENAME = 'NRC-VAD-Lexicon-v2.1.txt'
 INTERMEDIATE_OUTPUT_FILENAME = 'temporal_vad_with_full_sense_data.json'
-ML_READY_OUTPUT_FILENAME = 'ml_ready_temporal_vad_data.json'
+ML_READY_OUTPUT_FILENAME = 'emotracker_nrc.json'
 
 DEFAULT_VAD = [0.5, 0.5, 0.5]
 

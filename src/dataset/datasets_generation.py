@@ -438,7 +438,7 @@ class LexiconDatasetGenerator:
         output_dir.mkdir(exist_ok=True)
 
         # Save dataset
-        dataset_path = output_dir / f"ml_ready_temporal_vad_data_{lexicon_name}.json"
+        dataset_path = output_dir / f"emotracker_{lexicon_name}.json"
         ml_data_json = self._replace_nan_with_none(ml_data_filtered)
 
         with open(dataset_path, 'w', encoding='utf-8') as f:

@@ -22,7 +22,7 @@ MODEL_ASSETS_DIR = os.path.join(DATA_DIR, 'model_assets_pytorch')
 PYTORCH_MODEL_FILENAME = os.path.join(MODEL_ASSETS_DIR, 'lstm_vad_model_pytorch.pth')
 BACKEND_CONFIG_FILENAME = os.path.join(MODEL_ASSETS_DIR, 'backend_model_config_pytorch.json')
 script_dir = os.path.dirname(os.path.abspath(__file__))
-DATASET_PATH = os.path.normpath(os.path.join(DATA_DIR, 'Generated_VAD_Dataset', 'ml_ready_temporal_vad_data.json'))
+DATASET_PATH = os.path.normpath(os.path.join(DATA_DIR, 'Generated_VAD_Dataset', 'dataset_nrc', 'emotracker_nrc.json'))
 
 logging.info(f"Attempting to use device: {device}")
 

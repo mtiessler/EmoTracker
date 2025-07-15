@@ -2,7 +2,7 @@ import json
 import os
 import numpy as np
 
-ML_DATA_FILE_PATH = 'ml_ready_temporal_vad_data.json'
+ML_DATA_FILE_PATH = os.path.join('dataset_nrc', 'emotracker_nrc.json')
 LOOKBACK_WINDOW = 15 # todo sync with config
 
 

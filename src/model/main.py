@@ -26,7 +26,7 @@ def main():
     if not os.path.exists(ml_ready_data_file):
         logging.error(f"Data file not found: {ml_ready_data_file}")
         logging.error("Please run the data generation script "
-            "(the one that produced ml_ready_temporal_vad_data.json) first.")
+            "(the one that produced emotracker_nrc.json) first.")
         return
 
     trained_model, _, _ = train_and_evaluate_pytorch_lstm(
