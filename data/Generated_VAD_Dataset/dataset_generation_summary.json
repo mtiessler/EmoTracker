@@ -3,21 +3,21 @@
     "lexicon_name": "nrc",
     "lexicon_size": 54801,
     "dataset_size": 2935,
-    "dataset_path": "C:\\Users\\Max\\RoVertAD\\data\\Generated_VAD_Dataset\\dataset_nrc\\ml_ready_temporal_vad_data_nrc.json",
+    "dataset_path": "C:\\Users\\Max\\RoVertAD\\data\\Generated_VAD_Dataset\\dataset_nrc\\emotracker_nrc.json",
     "coverage": 0.053557416835459205
   },
   "warriner": {
     "lexicon_name": "warriner",
     "lexicon_size": 13905,
     "dataset_size": 2935,
-    "dataset_path": "C:\\Users\\Max\\RoVertAD\\data\\Generated_VAD_Dataset\\dataset_warriner\\ml_ready_temporal_vad_data_warriner.json",
+    "dataset_path": "C:\\Users\\Max\\RoVertAD\\data\\Generated_VAD_Dataset\\dataset_warriner\\emotracker_warriner.json",
     "coverage": 0.21107515282272563
   },
   "memolon": {
     "lexicon_name": "memolon",
     "lexicon_size": 1627127,
     "dataset_size": 2935,
-    "dataset_path": "C:\\Users\\Max\\RoVertAD\\data\\Generated_VAD_Dataset\\dataset_memolon\\ml_ready_temporal_vad_data_memolon.json",
+    "dataset_path": "C:\\Users\\Max\\RoVertAD\\data\\Generated_VAD_Dataset\\dataset_memolon\\emotracker_memolon.json",
     "coverage": 0.0018037928201056217
   }
 }

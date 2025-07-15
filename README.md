@@ -196,7 +196,7 @@ EmoTracker/
 │   │   ├── dataset_nrc/           # NRC lexicon-based datasets
 │   │   ├── dataset_warriner/      # Warriner lexicon-based datasets
 │   │   ├── dataset_memolon/       # MEmoLon lexicon-based datasets
-│   │   └── dataset_evaluator.py   # Dataset quality evaluation
+│   │   └── dataset_evaluation.py   # Dataset quality evaluation
 │   ├── model_assets_pytorch/      # Trained models and configurations
 │   ├── evaluation_results/        # Dataset evaluation outputs
 │   ├── Diachronic_Sense_Modeling/ # Input sense modeling data
@@ -233,7 +233,7 @@ This creates multiple dataset variants:
 
 ```bash
 cd src/dataset/
-python dataset_evaluator.py
+python dataset_evaluation.py
 ```
 
 Evaluates dataset quality through correlation analysis and performance metrics against gold standard VAD values.
