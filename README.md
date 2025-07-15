@@ -25,15 +25,14 @@ It also uses a **LSTM architecture** with **advanced momentum-based feature engi
   - [3. Train LSTM Model](#3-train-lstm-model)
   - [4. Launch Prediction API](#4-launch-prediction-api)
   - [5. Start Visualization Dashboard](#5-start-visualization-dashboard)
-- [API Usage](#api-usage)
-  - [Predict VAD Trajectory](#predict-vad-trajectory)
+- [Components](#components)
+  - [API Backend](#api-backend)
+  - [Client Dashboard](#client-dashboard)
+  - [Dataset Generation](#dataset-generation)
+  - [Model Training](#model-training)
 - [Visualization Dashboard Features](#visualization-dashboard-features)
   - [Dashboard Screenshots](#dashboard-screenshots)
 - [Model Performance](#model-performance)
-  - [Training Configuration](#training-configuration)
-  - [Training Results](#training-results)
-  - [Evaluation Metrics (Test Set)](#evaluation-metrics-test-set)
-  - [Model Accuracy Examples](#model-accuracy-examples)
 - [Innovations](#innovations)
 - [Research Applications](#research-applications)
 - [References](#references)
@@ -141,7 +140,7 @@ EnhancedLSTMForecast(
 
 **![LSTM Architecture](data/imgs/lstm.png)**
 
-*Figure 1: LSTM architecture with momentum feature engineering, multi-head attention, and residual connections for temporal VAD prediction.*
+The LSTM architecture with momentum feature engineering, multi-head attention, and residual connections enables temporal VAD prediction with exceptional accuracy.
 
 ---
 
@@ -150,39 +149,63 @@ EnhancedLSTMForecast(
 ```
 EmoTracker/
 │
-├── api/                     # Flask API Backend
-│   ├── config.py           # Resource loading and model configuration
-│   ├── features.py         # Advanced momentum feature engineering
-│   ├── models.py           # LSTM model definition
-│   ├── prediction.py       # Iterative VAD trajectory prediction
-│   └── wsgi.py            # Flask web server and API endpoints
+├── api/                           # Flask API Backend
+│   ├── __init__.py
+│   ├── api_request_example.http   # Example API requests
+│   ├── config.py                  # Resource loading and model configuration
+│   ├── features.py                # Advanced momentum feature engineering
+│   ├── models.py                  # LSTM model definition
+│   ├── prediction.py              # Iterative VAD trajectory prediction
+│   ├── wsgi.py                    # Flask web server and API endpoints
+│   ├── forecasting_empirical_evaluation.py  # Performance evaluation script
+│   ├── requirements.txt           # Python dependencies
+│   ├── Dockerfile                 # Container configuration
+│   ├── README.md                  # API documentation
+│   └── forecasting_evaluation_results/
+│       ├── __init__.py
+│       ├── word_performance_results.csv      # Performance metrics
+│       ├── analysis_report.txt               # Detailed analysis
+│       └── performance_summary.txt           # Statistical summary
 │
 ├── src/
-│   ├── dataset/            # Dataset Generation Pipeline
-│   │   ├── dataset_generation.py  # VAD dataset creation from sense data
-│   │   └── format_converter.py    # Pickle to JSON conversion utilities
+│   ├── dataset/                   # Dataset Generation Pipeline
+│   │   ├── __init__.py
+│   │   ├── datasets_generation.py     # VAD dataset creation from sense data
+│   │   ├── datasets_evaluation.py     # Dataset quality evaluation
+│   │   ├── format_converter.py        # Pickle to JSON conversion utilities
+│   │   ├── nrc_dataset_generation.py  # NRC-specific dataset processing
+│   │   └── nrc_evaluation.py         # NRC dataset evaluation
 │   │
-│   └── model/              # LSTM Training Pipeline
-│       ├── config.py       # Training hyperparameters and paths
-│       ├── dataset.py      # PyTorch dataset wrapper
-│       ├── main.py         # Training orchestration
-│       ├── model.py        # LSTM architecture
-│       ├── preprocessing.py # Feature engineering and data preparation
-│       ├── trainer.py      # Training loop with validation and metrics
-│       └── utils.py        # Utility functions and helpers
+│   └── model/                     # LSTM Training Pipeline
+│       ├── __init__.py
+│       ├── config.py              # Training hyperparameters and paths
+│       ├── dataset.py             # PyTorch dataset wrapper
+│       ├── main.py                # Training orchestration
+│       ├── model.py               # LSTM architecture
+│       ├── preprocessing.py       # Feature engineering and data preparation
+│       ├── trainer.py             # Training loop with validation and metrics
+│       └── utils.py               # Utility functions and helpers
 │
-├── client/                 # React Visualization Dashboard
-│   └── src/               # Interactive VAD trajectory visualizations
+├── client/                        # React Visualization Dashboard
+│   ├── src/                       # Interactive VAD trajectory visualizations
+│   ├── package.json              # Node.js dependencies
+│   └── README.md                 # Dashboard documentation
 │
 ├── data/
 │   ├── Generated_VAD_Dataset/     # ML-ready temporal VAD data
+│   │   ├── dataset_nrc/           # NRC lexicon-based datasets
+│   │   ├── dataset_warriner/      # Warriner lexicon-based datasets
+│   │   ├── dataset_memolon/       # MEmoLon lexicon-based datasets
+│   │   └── dataset_evaluator.py   # Dataset quality evaluation
 │   ├── model_assets_pytorch/      # Trained models and configurations
-│   └── [raw sense modeling data] # Input datasets
+│   ├── evaluation_results/        # Dataset evaluation outputs
+│   ├── Diachronic_Sense_Modeling/ # Input sense modeling data
+│   ├── VAD_Lexicons/             # Reference VAD lexicons
+│   └── imgs/                     # Documentation images
 │
-└── requirements.txt
+├── requirements.txt              # Python dependencies
+└── README.md                     # This file
 ```
-
-*Figure 2: EmoTracker project organization showing API backend, model training pipeline, and visualization dashboard components.*
 
 ---
 
@@ -198,12 +221,24 @@ pip install -r requirements.txt
 
 ```bash
 cd src/dataset/
-python dataset_generation.py
+python datasets_generation.py
 ```
 
-This creates `ml_ready_temporal_vad_data.json` with unified temporal VAD trajectories.
+This creates multiple dataset variants:
+- `emotracker_nrc.json` - NRC VAD lexicon-based dataset
+- `emotracker_warriner.json` - Warriner et al. lexicon-based dataset  
+- `emotracker_memolon.json` - MEmoLon lexicon-based dataset
 
-### 3. Train LSTM Model
+### 3. Evaluate Dataset Quality (Optional)
+
+```bash
+cd src/dataset/
+python dataset_evaluator.py
+```
+
+Evaluates dataset quality through correlation analysis and performance metrics against gold standard VAD values.
+
+### 4. Train LSTM Model
 
 ```bash
 cd src/model/
@@ -212,7 +247,7 @@ python main.py
 
 Trains the LSTM with momentum features and saves model assets to `data/model_assets_pytorch/`.
 
-### 4. Launch Prediction API
+### 5. Launch Prediction API
 
 ```bash
 cd api/
@@ -221,7 +256,7 @@ python wsgi.py
 
 Starts Flask API server on `http://localhost:5000` with `/predict` endpoint.
 
-### 5. Start Visualization Dashboard
+### 6. Start Visualization Dashboard
 
 ```bash
 cd client/
@@ -230,36 +265,60 @@ npm install && npm start
 
 Launches React dashboard for interactive VAD trajectory exploration.
 
----
-
-## API Usage
-
-### Predict VAD Trajectory
+### 7. Run Empirical Evaluation (Optional)
 
 ```bash
-curl -X POST http://localhost:5000/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "word": "abandon",
-    "predict_from_year": 2010,
-    "predict_until_year": 2040
-  }'
+cd api/
+python forecasting_empirical_evaluation.py
 ```
 
-**Response**:
-```json
-{
-  "predictions": [
-    {
-      "time": 2015,
-      "v": 0.284,
-      "a": 0.156,
-      "d": 0.239
-    },
-    ...
-  ]
-}
-```
+Generates comprehensive performance analysis and evaluation metrics for model validation.
+
+---
+
+## Components
+
+### API Backend
+
+The Flask-based API provides VAD trajectory prediction endpoints with LSTM forecasting capabilities. See [api/README.md](api/README.md) for detailed documentation including:
+
+- **Setup and installation** (Docker and local)
+- **API reference** with request/response examples
+- **Reproducible analysis** using `forecasting_empirical_evaluation.py`
+- **Performance metrics** and evaluation results
+- **Configuration** and deployment instructions
+
+### Client Dashboard
+
+Interactive React-based visualization platform for exploring temporal VAD trajectories. See [client/README.md](client/README.md) for comprehensive documentation covering:
+
+- **Multi-dimensional visualizations** (2D, 3D, 4D)
+- **Real-time forecasting** with API integration
+- **Multi-word comparisons** and trajectory analysis
+- **Interactive controls** and customization options
+- **Setup and development** instructions
+
+### Dataset Generation
+
+The `src/dataset/` pipeline creates temporal VAD datasets from sense modeling data:
+
+- **`datasets_generation.py`**: Main dataset creation from multiple VAD lexicons
+- **`datasets_evaluation.py`**: Quality assessment and correlation analysis
+- **`format_converter.py`**: Data format conversion utilities
+- **`nrc_dataset_generation.py`**: NRC-specific processing pipeline
+- **`nrc_evaluation.py`**: NRC dataset validation and metrics
+
+### Model Training
+
+The `src/model/` pipeline handles LSTM training with momentum features:
+
+- **`main.py`**: Training orchestration and model persistence
+- **`model.py`**: LSTM architecture with attention mechanisms
+- **`preprocessing.py`**: Advanced momentum feature engineering
+- **`trainer.py`**: Training loop with validation and early stopping
+- **`dataset.py`**: PyTorch dataset wrapper for temporal sequences
+- **`utils.py`**: Utility functions for data processing
+- **`config.py`**: Training configuration and hyperparameters
 
 ---
 
@@ -289,81 +348,5 @@ The React-based dashboard provides:
 **![Multi-word Comparison](data/imgs/multi_word_comparison.png)**
 
 *Figure 5: Multi-word VAD trajectory comparison showing emotional evolution patterns across different lexical items with synchronized time axes and forecast extensions.*
-
----
-
-## Model Performance
-
-### Training Configuration
-- **Input Features**: 27 (3 base VAD differences + 24 momentum features)
-- **Architecture**: 2-layer LSTM (128 hidden units) + Multi-head Attention (8 heads)
-- **Lookback Window**: 15 timesteps (75 years at 5-year intervals)
-- **Training Split**: Pre-1980 for training, post-1980 for validation
-- **Regularization**: Dropout (0.2), Early Stopping, Gradient Clipping
-- **Optimizer**: AdamW with ReduceLROnPlateau scheduling
-
-### Training Results
-- **Total Epochs**: 46/100 (Early stopping triggered)
-- **Best Validation Loss**: 0.11506 (Epoch 36)
-- **Final Training Loss**: 0.04871
-- **Training Time**: ~17 minutes on CPU
-
-### Evaluation Metrics (Test Set)
-- **Overall Test MAE**: 0.000278 
-- **Overall Test RMSE**: 0.001134
-- **Per-dimension Performance**:
-  - **Valence**: MAE = 0.000355, RMSE = 0.001428
-  - **Arousal**: MAE = 0.000247, RMSE = 0.001056  
-  - **Dominance**: MAE = 0.000232, RMSE = 0.000840
-
-### Model Accuracy Examples
-**Word: "body" - Predicted vs Actual VAD Values**
-```
-Year 2000: Predicted(0.1636, -0.1769, 0.0758) vs Actual(0.1636, -0.1770, 0.0757)
-Year 2005: Predicted(0.1654, -0.1768, 0.0792) vs Actual(0.1655, -0.1770, 0.0792)
-Year 2010: Predicted(0.1675, -0.1769, 0.0829) vs Actual(0.1675, -0.1770, 0.0828)
-```
-
-**Still to do**
-
-**![Training Performance](data/imgs/training_performance.png)**
-
-*Figure 7: Training and validation loss curves showing model convergence with early stopping at epoch 46, achieving great accuracy with sub-0.001 MAE across all VAD dimensions.*
-
-**![Feature Importance Analysis](data/imgs/feature_importance.png)**
-
-*Figure 8: Analysis of momentum feature contributions showing relative importance of velocity, acceleration, volatility, and trend features for VAD prediction accuracy.*
-
----
-
-## Innovations
-
-1. **Advanced Momentum Tracking**: 8 sophisticated temporal features capture complex emotional dynamics beyond simple differences
-2. **Attention-Enhanced LSTM**: Multi-head attention mechanisms identify important temporal relationships
-3. **Production-Ready Architecture**: Complete model persistence, scaling, and API integration
-4. **Exceptional Accuracy**: Sub-millisecond MAE/RMSE on temporal VAD prediction tasks
-5. **Multi-dimensional Analysis**: Support for sense-aware emotional trajectory modeling
-6. **3D Trajectory Visualization**: A novel way to visualize and understand diachronic emotional evolution
-
----
-
-## Research Applications
-
-EmoTracker enables research in:
-
-* **Computational Linguistics**: Diachronic semantic change detection
-* **Digital Humanities**: Historical emotion analysis in literary corpora  
-* **Social Science**: Tracking societal attitude shifts through language
-* **NLP**: Temporal emotion-aware language models
-* **Lexicography**: Dynamic emotion lexicon construction
-
----
-
-## References
-
-* Hu et al. (2019). *Diachronic Sense Modeling with Deep Contextualized Word Embeddings*. ACL 2019.
-* Mohammad (2018). *Obtaining Reliable Human Ratings of Valence, Arousal, and Dominance for 20,000 English Words*. LREC 2018.
-
-... still to finish :P
 
 ---
