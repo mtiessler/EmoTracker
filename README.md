@@ -260,7 +260,8 @@ Starts Flask API server on `http://localhost:5000` with `/predict` endpoint.
 
 ```bash
 cd client/
-npm install && npm start
+npm install 
+npm start
 ```
 
 Launches React dashboard for interactive VAD trajectory exploration.
