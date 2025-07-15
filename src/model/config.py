@@ -6,7 +6,8 @@ SCALERS_OUTPUT_PICKLE_FILENAME = 'vad_scalers_output_pytorch.pkl'
 MODEL_ASSETS_DIR = os.path.join('..', '..', 'data', 'model_assets_pytorch')
 BACKEND_CONFIG_FILENAME = os.path.join(MODEL_ASSETS_DIR, 'backend_model_config_pytorch.json')
 TIME_STEP_YEARS = 5
-ML_READY_OUTPUT_FILENAME_FOR_GENERATION = 'emotracker_nrc.json'
+
+ML_READY_OUTPUT_FILENAME_FOR_GENERATION = os.path.join('dataset_nrc', 'emotracker_nrc.json')
 
 LOOKBACK_PARAM = 15
 FORECAST_HORIZON_PARAM = 1
