@@ -264,7 +264,7 @@ npm install
 npm start
 ```
 
-Launches React dashboard for interactive VAD trajectory exploration.
+Launches EmoTracker dashboard for interactive VAD trajectory exploration. For importing a dataset, just drag and drop any of the generated datasets in `data/Generated_VAD_Dataset/dataset_X`.
 
 ### 7. Run Empirical Evaluation (Optional)
 

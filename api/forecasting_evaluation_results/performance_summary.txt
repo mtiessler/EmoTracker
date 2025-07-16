@@ -7,97 +7,97 @@ Prediction task: 1980 -> 2010 (30-year forecasting)
 OVERALL PERFORMANCE DISTRIBUTION:
 ----------------------------------------
 MAE STATISTICS:
-  10th percentile: 0.001256
-  25th percentile: 0.003654
-  50th percentile: 0.008099
-  75th percentile: 0.016742
-  90th percentile: 0.031220
-  95th percentile: 0.043006
-  99th percentile: 0.073359
-Mean: 0.013308
-Std:  0.016637
+  10th percentile: 0.001251
+  25th percentile: 0.003608
+  50th percentile: 0.008033
+  75th percentile: 0.016629
+  90th percentile: 0.031024
+  95th percentile: 0.042894
+  99th percentile: 0.072830
+Mean: 0.013239
+Std:  0.016599
 
 RMSE STATISTICS:
-  10th percentile: 0.001410
-  25th percentile: 0.004288
-  50th percentile: 0.009266
-  75th percentile: 0.019035
-  90th percentile: 0.035053
-  95th percentile: 0.047493
-  99th percentile: 0.082864
-Mean: 0.015026
-Std:  0.018368
+  10th percentile: 0.001391
+  25th percentile: 0.004242
+  50th percentile: 0.009229
+  75th percentile: 0.018981
+  90th percentile: 0.034754
+  95th percentile: 0.047483
+  99th percentile: 0.082894
+Mean: 0.014946
+Std:  0.018317
 
 PERFORMANCE CATEGORIES:
 ----------------------------------------
 MAE Categories:
-Excellent (MAE <= 0.01):      1692 words (57.6%)
-Good (0.01 < MAE <= 0.05):    1141 words (38.9%)
-Fair (0.05 < MAE <= 0.10):      89 words (3.0%)
+Excellent (MAE <= 0.01):      1697 words (57.8%)
+Good (0.01 < MAE <= 0.05):    1137 words (38.7%)
+Fair (0.05 < MAE <= 0.10):      88 words (3.0%)
 Poor (MAE > 0.10):              13 words (0.4%)
 
 RMSE Categories:
-Excellent (RMSE <= 0.015):    1962 words (66.8%)
-Good (0.015 < RMSE <= 0.075):   928 words (31.6%)
-Fair (0.075 < RMSE <= 0.15):     39 words (1.3%)
+Excellent (RMSE <= 0.015):    1971 words (67.2%)
+Good (0.015 < RMSE <= 0.075):   920 words (31.3%)
+Fair (0.075 < RMSE <= 0.15):     38 words (1.3%)
 Poor (RMSE > 0.15):              6 words (0.2%)
 
 DIMENSION-SPECIFIC PERFORMANCE:
 ----------------------------------------------------------------------
 Dimension  Correlation  R-squared  Mean MAE   Mean RMSE  Med MAE    Med RMSE  
 ----------------------------------------------------------------------
-Valence    0.9913       0.9827     0.014567   0.014567   0.007317   0.007317  
-Arousal    0.9932       0.9864     0.012620   0.012620   0.006662   0.006662  
-Dominance  0.9930       0.9861     0.012736   0.012736   0.006802   0.006802  
+Valence    0.9914       0.9829     0.014523   0.014523   0.007276   0.007276  
+Arousal    0.9932       0.9864     0.012542   0.012542   0.006613   0.006613  
+Dominance  0.9931       0.9862     0.012652   0.012652   0.006733   0.006733  
 
 TOP 10 BEST PERFORMERS (MAE):
 ----------------------------------------
- 1. federal         MAE: 0.000029 RMSE: 0.000032
- 2. exceptional     MAE: 0.000050 RMSE: 0.000059
- 3. factory         MAE: 0.000053 RMSE: 0.000059
- 4. yesterday       MAE: 0.000056 RMSE: 0.000058
- 5. eighteenth      MAE: 0.000056 RMSE: 0.000067
- 6. declaration     MAE: 0.000064 RMSE: 0.000080
- 7. tiny            MAE: 0.000067 RMSE: 0.000069
- 8. elsewhere       MAE: 0.000068 RMSE: 0.000090
- 9. cottage         MAE: 0.000072 RMSE: 0.000098
-10. anger           MAE: 0.000072 RMSE: 0.000102
+ 1. factory         MAE: 0.000004 RMSE: 0.000004
+ 2. unnecessary     MAE: 0.000010 RMSE: 0.000014
+ 3. somebody        MAE: 0.000011 RMSE: 0.000014
+ 4. education       MAE: 0.000017 RMSE: 0.000023
+ 5. temporary       MAE: 0.000017 RMSE: 0.000019
+ 6. ninth           MAE: 0.000018 RMSE: 0.000023
+ 7. unique          MAE: 0.000019 RMSE: 0.000023
+ 8. federal         MAE: 0.000023 RMSE: 0.000027
+ 9. tiny            MAE: 0.000024 RMSE: 0.000032
+10. yesterday       MAE: 0.000024 RMSE: 0.000029
 
 TOP 10 BEST PERFORMERS (RMSE):
 ----------------------------------------
- 1. federal         MAE: 0.000029 RMSE: 0.000032
- 2. yesterday       MAE: 0.000056 RMSE: 0.000058
- 3. exceptional     MAE: 0.000050 RMSE: 0.000059
- 4. factory         MAE: 0.000053 RMSE: 0.000059
- 5. eighteenth      MAE: 0.000056 RMSE: 0.000067
- 6. tiny            MAE: 0.000067 RMSE: 0.000069
- 7. declaration     MAE: 0.000064 RMSE: 0.000080
- 8. elsewhere       MAE: 0.000068 RMSE: 0.000090
- 9. us              MAE: 0.000082 RMSE: 0.000090
-10. anywhere        MAE: 0.000075 RMSE: 0.000093
+ 1. factory         MAE: 0.000004 RMSE: 0.000004
+ 2. somebody        MAE: 0.000011 RMSE: 0.000014
+ 3. unnecessary     MAE: 0.000010 RMSE: 0.000014
+ 4. temporary       MAE: 0.000017 RMSE: 0.000019
+ 5. ninth           MAE: 0.000018 RMSE: 0.000023
+ 6. unique          MAE: 0.000019 RMSE: 0.000023
+ 7. education       MAE: 0.000017 RMSE: 0.000023
+ 8. federal         MAE: 0.000023 RMSE: 0.000027
+ 9. tomorrow        MAE: 0.000028 RMSE: 0.000029
+10. yesterday       MAE: 0.000024 RMSE: 0.000029
 
 TOP 10 WORST PERFORMERS (MAE):
 ----------------------------------------
- 1. peaceful        MAE: 0.263699 RMSE: 0.276338
- 2. gay             MAE: 0.175624 RMSE: 0.214476
- 3. bacon           MAE: 0.165044 RMSE: 0.168681
- 4. depression      MAE: 0.163483 RMSE: 0.167737
- 5. vanity          MAE: 0.160501 RMSE: 0.179472
- 6. cabinet         MAE: 0.145005 RMSE: 0.174228
- 7. contention      MAE: 0.129046 RMSE: 0.134869
- 8. stress          MAE: 0.123538 RMSE: 0.128713
- 9. mad             MAE: 0.114773 RMSE: 0.130269
-10. wicked          MAE: 0.112882 RMSE: 0.133310
+ 1. peaceful        MAE: 0.262704 RMSE: 0.274413
+ 2. gay             MAE: 0.176761 RMSE: 0.214435
+ 3. depression      MAE: 0.164881 RMSE: 0.168684
+ 4. vanity          MAE: 0.163910 RMSE: 0.183926
+ 5. bacon           MAE: 0.162696 RMSE: 0.166326
+ 6. cabinet         MAE: 0.149857 RMSE: 0.178857
+ 7. contention      MAE: 0.128561 RMSE: 0.134361
+ 8. stress          MAE: 0.123181 RMSE: 0.128354
+ 9. mad             MAE: 0.113030 RMSE: 0.128374
+10. wicked          MAE: 0.111410 RMSE: 0.131749
 
 TOP 10 WORST PERFORMERS (RMSE):
 ----------------------------------------
- 1. peaceful        MAE: 0.263699 RMSE: 0.276338
- 2. gay             MAE: 0.175624 RMSE: 0.214476
- 3. vanity          MAE: 0.160501 RMSE: 0.179472
- 4. cabinet         MAE: 0.145005 RMSE: 0.174228
- 5. bacon           MAE: 0.165044 RMSE: 0.168681
- 6. depression      MAE: 0.163483 RMSE: 0.167737
- 7. contention      MAE: 0.129046 RMSE: 0.134869
- 8. wicked          MAE: 0.112882 RMSE: 0.133310
- 9. mad             MAE: 0.114773 RMSE: 0.130269
-10. stress          MAE: 0.123538 RMSE: 0.128713
+ 1. peaceful        MAE: 0.262704 RMSE: 0.274413
+ 2. gay             MAE: 0.176761 RMSE: 0.214435
+ 3. vanity          MAE: 0.163910 RMSE: 0.183926
+ 4. cabinet         MAE: 0.149857 RMSE: 0.178857
+ 5. depression      MAE: 0.164881 RMSE: 0.168684
+ 6. bacon           MAE: 0.162696 RMSE: 0.166326
+ 7. contention      MAE: 0.128561 RMSE: 0.134361
+ 8. wicked          MAE: 0.111410 RMSE: 0.131749
+ 9. mad             MAE: 0.113030 RMSE: 0.128374
+10. stress          MAE: 0.123181 RMSE: 0.128354

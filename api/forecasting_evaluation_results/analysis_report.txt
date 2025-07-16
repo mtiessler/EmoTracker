@@ -5,73 +5,73 @@ Total words analyzed: 2935
 
 OVERALL MAE PERFORMANCE:
 count    2935.000000
-mean        0.013308
-std         0.016637
-min         0.000029
-25%         0.003654
-50%         0.008099
-75%         0.016742
-max         0.263699
+mean        0.013239
+std         0.016599
+min         0.000004
+25%         0.003608
+50%         0.008033
+75%         0.016629
+max         0.262704
 
 OVERALL RMSE PERFORMANCE:
 count    2935.000000
-mean        0.015026
-std         0.018368
-min         0.000032
-25%         0.004288
-50%         0.009266
-75%         0.019035
-max         0.276338
+mean        0.014946
+std         0.018317
+min         0.000004
+25%         0.004242
+50%         0.009229
+75%         0.018981
+max         0.274413
 
 TOP 10 BEST PERFORMING WORDS (MAE):
        word  mae_overall  rmse_overall
-    federal     0.000029      0.000032
-exceptional     0.000050      0.000059
-    factory     0.000053      0.000059
-  yesterday     0.000056      0.000058
- eighteenth     0.000056      0.000067
-declaration     0.000064      0.000080
-       tiny     0.000067      0.000069
-  elsewhere     0.000068      0.000090
-    cottage     0.000072      0.000098
-      anger     0.000072      0.000102
+    factory     0.000004      0.000004
+unnecessary     0.000010      0.000014
+   somebody     0.000011      0.000014
+  education     0.000017      0.000023
+  temporary     0.000017      0.000019
+      ninth     0.000018      0.000023
+     unique     0.000019      0.000023
+    federal     0.000023      0.000027
+       tiny     0.000024      0.000032
+  yesterday     0.000024      0.000029
 
 TOP 10 BEST PERFORMING WORDS (RMSE):
        word  mae_overall  rmse_overall
-    federal     0.000029      0.000032
-  yesterday     0.000056      0.000058
-exceptional     0.000050      0.000059
-    factory     0.000053      0.000059
- eighteenth     0.000056      0.000067
-       tiny     0.000067      0.000069
-declaration     0.000064      0.000080
-  elsewhere     0.000068      0.000090
-         us     0.000082      0.000090
-   anywhere     0.000075      0.000093
+    factory     0.000004      0.000004
+   somebody     0.000011      0.000014
+unnecessary     0.000010      0.000014
+  temporary     0.000017      0.000019
+      ninth     0.000018      0.000023
+     unique     0.000019      0.000023
+  education     0.000017      0.000023
+    federal     0.000023      0.000027
+   tomorrow     0.000028      0.000029
+  yesterday     0.000024      0.000029
 
 TOP 10 WORST PERFORMING WORDS (MAE):
       word  mae_overall  rmse_overall
-  peaceful     0.263699      0.276338
-       gay     0.175624      0.214476
-     bacon     0.165044      0.168681
-depression     0.163483      0.167737
-    vanity     0.160501      0.179472
-   cabinet     0.145005      0.174228
-contention     0.129046      0.134869
-    stress     0.123538      0.128713
-       mad     0.114773      0.130269
-    wicked     0.112882      0.133310
+  peaceful     0.262704      0.274413
+       gay     0.176761      0.214435
+depression     0.164881      0.168684
+    vanity     0.163910      0.183926
+     bacon     0.162696      0.166326
+   cabinet     0.149857      0.178857
+contention     0.128561      0.134361
+    stress     0.123181      0.128354
+       mad     0.113030      0.128374
+    wicked     0.111410      0.131749
 
 TOP 10 WORST PERFORMING WORDS (RMSE):
       word  mae_overall  rmse_overall
-  peaceful     0.263699      0.276338
-       gay     0.175624      0.214476
-    vanity     0.160501      0.179472
-   cabinet     0.145005      0.174228
-     bacon     0.165044      0.168681
-depression     0.163483      0.167737
-contention     0.129046      0.134869
-    wicked     0.112882      0.133310
-       mad     0.114773      0.130269
-    stress     0.123538      0.128713
+  peaceful     0.262704      0.274413
+       gay     0.176761      0.214435
+    vanity     0.163910      0.183926
+   cabinet     0.149857      0.178857
+depression     0.164881      0.168684
+     bacon     0.162696      0.166326
+contention     0.128561      0.134361
+    wicked     0.111410      0.131749
+       mad     0.113030      0.128374
+    stress     0.123181      0.128354
 
