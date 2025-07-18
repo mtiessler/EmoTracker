@@ -258,7 +258,16 @@ def create_sequences_pytorch_with_momentum_features(ml_ready_data_path, lookback
 
         X_train, y_train_diff = X_data[train_idx], y_data_target_diff[train_idx]
         X_test, y_test_diff = X_data[test_idx], y_data_target_diff[test_idx]
-
+        logging.info(f"Dataset split at year {train_until_year}:")
+        logging.info(f"  Total sequences: {len(X_data)}")
+        logging.info(f"  Training sequences (≤{train_until_year}): {len(X_train)}")
+        logging.info(f"  Test sequences (>{train_until_year}): {len(X_test)}")
+        logging.info(f"  Training percentage: {len(X_train) / len(X_data) * 100:.1f}%")
+        logging.info(f"  Test percentage: {len(X_test) / len(X_data) * 100:.1f}%")
+        unique_train_words = len(set(words_for_sequences_data[train_idx])) if len(train_idx) > 0 else 0
+        unique_test_words = len(set(words_for_sequences_data[test_idx])) if len(test_idx) > 0 else 0
+        logging.info(f"  Unique words in training: {unique_train_words}")
+        logging.info(f"  Unique words in test: {unique_test_words}")
         y_test_actual = y_actual_values[test_idx] if test_idx.size > 0 else np.array([])
         last_actuals_for_test_reconstruction = last_actuals_for_reconstruction_data[
             test_idx] if test_idx.size > 0 else np.array([])
